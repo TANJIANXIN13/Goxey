@@ -1,0 +1,197 @@
+import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
+import 'package:animate_do/animate_do.dart';
+import '../core/theme.dart';
+
+class AvatarCreatorPage extends StatefulWidget {
+  const AvatarCreatorPage({super.key});
+
+  @override
+  State<AvatarCreatorPage> createState() => _AvatarCreatorPageState();
+}
+
+class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
+  CameraController? _controller;
+  List<CameraDescription>? _cameras;
+  bool _isInitialized = false;
+  bool _isProcessing = false;
+  XFile? _capturedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      _cameras = await availableCameras();
+      if (_cameras != null && _cameras!.isNotEmpty) {
+        // Try to find the front camera
+        CameraDescription selectedCamera = _cameras!.first;
+        for (var camera in _cameras!) {
+          if (camera.lensDirection == CameraLensDirection.front) {
+            selectedCamera = camera;
+            break;
+          }
+        }
+
+        _controller = CameraController(
+          selectedCamera,
+          ResolutionPreset.medium,
+          enableAudio: false,
+        );
+
+        await _controller!.initialize();
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error initializing camera: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _captureAndProcess() async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
+
+    try {
+      final XFile image = await _controller!.takePicture();
+      setState(() {
+        _capturedImage = image;
+        _isProcessing = true;
+      });
+
+      // Simulate AI Processing
+      await Future.delayed(const Duration(seconds: 3));
+
+      // Templates for avatars
+      final avatarTemplates = [
+        "https://models.readyplayer.me/658a9e70f6e522f29a03977a.glb",
+        "https://models.readyplayer.me/658a9e96f6e522f29a0397a6.glb",
+        "https://models.readyplayer.me/658a9eb8f6e522f29a0397cf.glb",
+      ];
+      
+      final randomUrl = (avatarTemplates..shuffle()).first;
+
+      if (mounted) {
+        Navigator.pop(context, randomUrl);
+      }
+    } catch (e) {
+      debugPrint("Error capturing picture: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: const Text("Face Scan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: _buildCameraFeed(),
+            ),
+          ),
+          _buildBottomControls(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCameraFeed() {
+    if (_isProcessing) {
+      return FadeIn(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 80,
+              height: 80,
+              child: CircularProgressIndicator(color: GoXeyColors.neonLime, strokeWidth: 8),
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              "SCANNING FEATURES...",
+              style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, letterSpacing: 2),
+            ),
+            const SizedBox(height: 12),
+            Text("Mapping 3D Vertices", style: TextStyle(color: Colors.white.withOpacity(0.5))),
+          ],
+        ),
+      );
+    }
+
+    if (!_isInitialized || _controller == null) {
+      return const CircularProgressIndicator(color: GoXeyColors.neonLime);
+    }
+
+    return Container(
+      margin: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3), width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: AspectRatio(
+          aspectRatio: 1 / _controller!.value.aspectRatio,
+          child: CameraPreview(_controller!),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomControls() {
+    if (_isProcessing) return const SizedBox(height: 100);
+
+    return Container(
+      padding: const EdgeInsets.only(bottom: 50, top: 20),
+      child: Column(
+        children: [
+          const Text(
+            "Align your face within the frame",
+            style: TextStyle(color: Colors.white54, fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: _captureAndProcess,
+            child: Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 4),
+              ),
+              padding: const EdgeInsets.all(4),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: GoXeyColors.neonLime,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.camera_alt, color: Colors.black),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

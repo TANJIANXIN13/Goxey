@@ -4,27 +4,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppState extends ChangeNotifier {
   bool _isGoxeyMode = false;
-  late double _totalBalance;
-  late double _pocketsBalance;
+  double _totalBalance = 5000.00;
+  double _pocketsBalance = 0.00;
+  String _avatarUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
 
   bool get isGoxeyMode => _isGoxeyMode;
   double get totalBalance => _totalBalance;
   double get pocketsBalance => _pocketsBalance;
+  String get avatarUrl => _avatarUrl;
 
   AppState() {
-    _randomizeBalances();
-    _loadMode();
+    _loadState();
   }
 
-  void _randomizeBalances() {
-    final random = Random();
-    _totalBalance = 1000 + random.nextDouble() * 9000; // RM 1000 - 10000
-    _pocketsBalance = 50 + random.nextDouble() * 500; // RM 50 - 550
-  }
-
-  Future<void> _loadMode() async {
+  Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
     _isGoxeyMode = prefs.getBool('isGoxeyMode') ?? false;
+    _totalBalance = prefs.getDouble('totalBalance') ?? 5000.00;
+    _pocketsBalance = prefs.getDouble('pocketsBalance') ?? 0.00;
+    _avatarUrl = prefs.getString('avatarUrl') ?? "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
     notifyListeners();
   }
 
@@ -33,5 +31,25 @@ class AppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isGoxeyMode', _isGoxeyMode);
     notifyListeners();
+  }
+
+  Future<void> updateAvatarUrl(String url) async {
+    _avatarUrl = url;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('avatarUrl', url);
+    notifyListeners();
+  }
+
+  Future<void> transferToPockets(double amount) async {
+    if (amount <= _totalBalance) {
+      _totalBalance -= amount;
+      _pocketsBalance += amount;
+      
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('totalBalance', _totalBalance);
+      await prefs.setDouble('pocketsBalance', _pocketsBalance);
+      
+      notifyListeners();
+    }
   }
 }

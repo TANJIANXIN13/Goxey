@@ -34,6 +34,75 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  void _showPocketMoneyDialog() {
+    final TextEditingController amountController = TextEditingController();
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Add Pocket Money", style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "How much do you want to save today?",
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              style: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                prefixText: "RM ",
+                prefixStyle: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final amount = double.tryParse(amountController.text) ?? 0;
+              if (amount > 0 && amount <= appState.totalBalance) {
+                appState.transferToPockets(amount);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Transferred RM ${amount.toStringAsFixed(2)} to Pockets!"),
+                    backgroundColor: GoXeyColors.neonLime,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Invalid amount or insufficient balance")),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GoXeyColors.neonLime,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _triggerQrPaymentFriction() {
     showModalBottomSheet(
       context: context,
@@ -141,7 +210,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ignoring: !isGoxey,
             child: Column(
               children: [
-                _buildAccountsSection(isGoxey, appState.pocketsBalance),
+                _buildAccountsSection(isGoxey, appState.totalBalance, appState.pocketsBalance),
                 const SizedBox(height: 24),
                 if (isGoxey) ...[
                   _buildAvatarBlindBoxSection(),
@@ -315,7 +384,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildAccountsSection(bool isGoxey, double pocketsBalance) {
+  Widget _buildAccountsSection(bool isGoxey, double totalBalance, double pocketsBalance) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -334,9 +403,14 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildAccountCard("Main account", "RM0.00", null, isGoxey)),
+              Expanded(child: _buildAccountCard("Main account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey)),
               const SizedBox(width: 12),
-              Expanded(child: _buildAccountCard("Pockets", "RM${pocketsBalance.toStringAsFixed(2)}", "Up to 3.55% p.a.", isGoxey)),
+              Expanded(
+                child: GestureDetector(
+                  onTap: isGoxey ? _showPocketMoneyDialog : () => _showFunctionalityToast("Pockets"),
+                  child: _buildAccountCard("Pockets", "RM${pocketsBalance.toStringAsFixed(2)}", "Up to 3.55% p.a.", isGoxey),
+                ),
+              ),
             ],
           ),
         ],
