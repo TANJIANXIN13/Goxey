@@ -29,8 +29,8 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
     if (mounted) {
       final appState = Provider.of<AppState>(context, listen: false);
       
-      // Hidden Logic: 5% chance for demo (1/20)
-      _isHidden = (DateTime.now().millisecond % 20 == 0);
+      // Hidden Logic: 10% chance for demo (1/10)
+      _isHidden = (DateTime.now().millisecond % 10 == 0);
 
       // Distribute rewards only for Dimoo (our active demo series)
       if (widget.seriesName == "Dimoo") {
