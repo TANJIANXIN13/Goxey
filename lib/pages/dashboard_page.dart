@@ -677,7 +677,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     appState.availableBoxes > 0 
                       ? () {
                           final seriesName = _seriesOptions[_selectedSeriesIndex]['name'];
-                          if (seriesName == "Dimoo") {
+                          if (seriesName == "Dimoo" || seriesName == "GoXey Original") {
                             Navigator.push(
                               context,
                               MaterialPageRoute(

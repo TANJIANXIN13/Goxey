@@ -32,21 +32,40 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
       // Hidden Logic: 10% chance for demo (1/10)
       _isHidden = (DateTime.now().millisecond % 10 == 0);
 
-      // Distribute rewards only for Dimoo (our active demo series)
-      if (widget.seriesName == "Dimoo") {
+      // Distribute rewards for active demo series
+      if (widget.seriesName == "Dimoo" || widget.seriesName == "GoXey Original") {
         if (_isHidden) {
-          _revealedAvatarUrl = "assets/avatars/dimoo/dimoo_hidden.png";
+          // Rare pulls for both series
+          if (widget.seriesName == "Dimoo") {
+            _revealedAvatarUrl = "assets/avatars/dimoo/dimoo_hidden.png";
+          } else {
+            _revealedAvatarUrl = "assets/avatars/goxey/goxey_hidden.jpg";
+          }
         } else {
-          List<String> pool = [
-            "assets/avatars/dimoo/dimoo_new_1.png", 
-            "assets/avatars/dimoo/dimoo_new_2.png", 
-            "assets/avatars/dimoo/dimoo_new_3.png", 
-            "assets/avatars/dimoo/dimoo_new_4.png", 
-          ];
+          Map<String, List<String>> pools = {
+            "Dimoo": [
+              "assets/avatars/dimoo/dimoo_new_1.png", 
+              "assets/avatars/dimoo/dimoo_new_2.png", 
+              "assets/avatars/dimoo/dimoo_new_3.png", 
+              "assets/avatars/dimoo/dimoo_new_4.png", 
+            ],
+            "GoXey Original": [
+              "assets/avatars/goxey/goxey_1.jpg",
+              "assets/avatars/goxey/goxey_2.jpg",
+              "assets/avatars/goxey/goxey_3.jpg",
+              "assets/avatars/goxey/goxey_4.jpg",
+              "assets/avatars/goxey/goxey_5.jpg",
+              "assets/avatars/goxey/goxey_6.jpg",
+              "assets/avatars/goxey/goxey_7.jpg",
+              "assets/avatars/goxey/goxey_8.jpg",
+              "assets/avatars/goxey/goxey_9.jpg",
+            ],
+          };
+          List<String> pool = pools[widget.seriesName] ?? pools["Dimoo"]!;
           _revealedAvatarUrl = (pool..shuffle()).first;
         }
       } else {
-        _revealedAvatarUrl = ""; // GoXey and others are coming soon
+        _revealedAvatarUrl = ""; // Others are coming soon
       }
       
       await appState.openBlindBox(); 
