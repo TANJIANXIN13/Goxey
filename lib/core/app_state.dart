@@ -13,6 +13,7 @@ class AppState extends ChangeNotifier {
   double get totalBalance => _totalBalance;
   double get pocketsBalance => _pocketsBalance;
   String get avatarUrl => _avatarUrl;
+  bool get hasCreatedAvatar => _avatarUrl != "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
   
   // Every RM 200 gives 1 box
   int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;

@@ -20,7 +20,9 @@ class MePage extends StatelessWidget {
               const SizedBox(height: 20),
               FadeInDown(
                 child: AvatarViewer(
-                  modelUrl: appState.avatarUrl,
+                  modelUrl: appState.hasCreatedAvatar
+                      ? appState.avatarUrl
+                      : "assets/avatars/goxey_placeholder.png",
                   height: 210,
                   width: 152,
                 ),
