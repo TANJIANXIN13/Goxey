@@ -1,71 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
-import '../core/theme.dart';
+import 'package:provider/provider.dart';
+import '../core/app_state.dart';
 
 class AvatarViewer extends StatelessWidget {
-  final bool isGhostMode;
-  final String modelUrl;
-
-  const AvatarViewer({
-    super.key,
-    this.isGhostMode = false,
-    this.modelUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.glb", // Placeholder GoXey IP
-  });
+  final String? modelUrl;
+  
+  const AvatarViewer({super.key, this.modelUrl});
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    final url = modelUrl ?? appState.avatarUrl;
+
+    // Check if the URL is an asset path (GoXey IP avatars) or a 3D model
+    bool isAsset = url.startsWith('assets/');
+    bool isGlb = url.endsWith('.glb');
+
     return Container(
-      height: 300,
       width: double.infinity,
+      height: 350,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(color: Colors.white10),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // If in ghost mode, maybe apply a shader or semi-transparent overlay
-          Opacity(
-            opacity: isGhostMode ? 0.4 : 1.0,
-            child: ModelViewer(
-              src: modelUrl,
-              alt: "GoXey Avatar 3D Model",
-              ar: true,
-              autoRotate: true,
-              cameraControls: true,
-              backgroundColor: Colors.transparent,
-              disableZoom: true,
-            ),
-          ),
-          if (isGhostMode)
-            Positioned(
-              top: 20,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: GoXeyColors.radicalRed.withOpacity(0.5)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.warning_amber_rounded, color: GoXeyColors.radicalRed, size: 16),
-                    const SizedBox(width: 8),
-                    Text(
-                      "GHOST MODE ACTIVE",
-                      style: TextStyle(
-                        color: GoXeyColors.radicalRed,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: _buildAvatar(url, isAsset, isGlb),
+      ),
+    );
+  }
+
+  Widget _buildAvatar(String url, bool isAsset, bool isGlb) {
+    if (isAsset) {
+      return Image.asset(
+        url,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Icon(Icons.person, size: 100, color: Colors.white24),
+        ),
+      );
+    }
+
+    if (isGlb) {
+      return ModelViewer(
+        src: url,
+        alt: "A 3D model of an avatar",
+        autoRotate: true,
+        cameraControls: true,
+        backgroundColor: Colors.transparent,
+      );
+    }
+
+    return Image.network(
+      url,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) => const Center(
+        child: Icon(Icons.person, size: 100, color: Colors.white24),
       ),
     );
   }

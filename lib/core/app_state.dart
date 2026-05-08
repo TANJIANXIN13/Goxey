@@ -6,12 +6,17 @@ class AppState extends ChangeNotifier {
   bool _isGoxeyMode = false;
   double _totalBalance = 5000.00;
   double _pocketsBalance = 0.00;
+  int _usedBoxesCount = 0;
   String _avatarUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
 
   bool get isGoxeyMode => _isGoxeyMode;
   double get totalBalance => _totalBalance;
   double get pocketsBalance => _pocketsBalance;
   String get avatarUrl => _avatarUrl;
+  
+  // Every RM 200 gives 1 box
+  int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;
+  double get progressToNextBox => (_pocketsBalance % 200) / 200;
 
   AppState() {
     _loadState();
@@ -22,6 +27,7 @@ class AppState extends ChangeNotifier {
     _isGoxeyMode = prefs.getBool('isGoxeyMode') ?? false;
     _totalBalance = prefs.getDouble('totalBalance') ?? 5000.00;
     _pocketsBalance = prefs.getDouble('pocketsBalance') ?? 0.00;
+    _usedBoxesCount = prefs.getInt('usedBoxesCount') ?? 0;
     _avatarUrl = prefs.getString('avatarUrl') ?? "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
     notifyListeners();
   }
@@ -48,6 +54,29 @@ class AppState extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble('totalBalance', _totalBalance);
       await prefs.setDouble('pocketsBalance', _pocketsBalance);
+      
+      notifyListeners();
+    }
+  }
+
+  Future<void> openBlindBox() async {
+    if (availableBoxes > 0) {
+      _usedBoxesCount++;
+      
+      // Randomly pick a new GoXey IP avatar
+      final avatarTemplates = [
+        "assets/avatars/avatar_1.jpg",
+        "assets/avatars/avatar_2.jpg",
+        "assets/avatars/avatar_3.jpg",
+        "assets/avatars/avatar_4.jpg",
+        "assets/avatars/avatar_5.jpg",
+      ];
+      
+      _avatarUrl = (avatarTemplates..shuffle()).first;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('usedBoxesCount', _usedBoxesCount);
+      await prefs.setString('avatarUrl', _avatarUrl);
       
       notifyListeners();
     }

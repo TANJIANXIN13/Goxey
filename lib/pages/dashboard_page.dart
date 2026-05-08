@@ -10,6 +10,8 @@ import '../widgets/mode_toggle.dart';
 import '../widgets/avatar_viewer.dart';
 import '../widgets/glass_container.dart';
 import 'history_page.dart';
+import 'blind_box_page.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'me_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -482,38 +484,95 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 16),
           const AvatarViewer(),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildAvatarAction("Open Blind Box", Icons.card_giftcard, () => _showFunctionalityToast("Blind Box")),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildAvatarAction("Customize Face", Icons.face_retouching_natural, () => _showFunctionalityToast("AI Customization")),
-              ),
-            ],
+          const SizedBox(height: 20),
+          Consumer<AppState>(
+            builder: (context, appState, child) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Next Box: RM ${(200 - (appState.pocketsBalance % 200)).toStringAsFixed(0)} left",
+                        style: const TextStyle(color: Colors.white54, fontSize: 12),
+                      ),
+                      Text(
+                        "${(appState.progressToNextBox * 100).toInt()}%",
+                        style: const TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  LinearPercentIndicator(
+                    lineHeight: 8.0,
+                    percent: appState.progressToNextBox,
+                    backgroundColor: Colors.white10,
+                    progressColor: GoXeyColors.neonLime,
+                    barRadius: const Radius.circular(4),
+                    padding: EdgeInsets.zero,
+                    animation: true,
+                    animateFromLastPercent: true,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildAvatarAction(
+                          appState.availableBoxes > 0 
+                            ? "Open Box (${appState.availableBoxes})" 
+                            : "Open Blind Box",
+                          Icons.card_giftcard,
+                          appState.availableBoxes > 0 
+                            ? () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const BlindBoxPage()),
+                                );
+                              }
+                            : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
+                          isHighlight: appState.availableBoxes > 0,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildAvatarAction("Customize Face", Icons.face_retouching_natural, () => _showFunctionalityToast("AI Customization")),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAvatarAction(String label, IconData icon, VoidCallback onTap) {
+  Widget _buildAvatarAction(String label, IconData icon, VoidCallback onTap, {bool isHighlight = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: isHighlight ? GoXeyColors.neonLime.withOpacity(0.2) : Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: isHighlight ? GoXeyColors.neonLime : Colors.white10),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white, size: 20),
+            Icon(icon, color: isHighlight ? GoXeyColors.neonLime : Colors.white, size: 20),
             const SizedBox(width: 12),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                label, 
+                style: TextStyle(
+                  color: isHighlight ? GoXeyColors.neonLime : Colors.white, 
+                  fontSize: 12, 
+                  fontWeight: FontWeight.bold
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),
