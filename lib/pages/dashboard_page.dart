@@ -468,6 +468,22 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  int _selectedSeriesIndex = 0;
+  final List<Map<String, dynamic>> _seriesOptions = [
+    {
+      "name": "GoXey Original",
+      "tag": "IP SERIES 1",
+      "color": GoXeyColors.neonLime,
+      "image": "assets/avatars/avatar_1.jpg", // Representing the series
+    },
+    {
+      "name": "Popmart Collab",
+      "tag": "LIMITED EDITION",
+      "color": GoXeyColors.radicalRed,
+      "image": "assets/avatars/avatar_6.jpg", // Different style for collab
+    },
+  ];
+
   Widget _buildAvatarBlindBoxSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -478,18 +494,75 @@ class _DashboardPageState extends State<DashboardPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "GoXey x Popmart IP",
+                "Series Collection",
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                "SQUAD ACTIVE",
-                style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
+                "SWIPE TO BROWSE",
+                style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const AvatarViewer(),
-          const SizedBox(height: 20),
+          // Series Carousel
+          SizedBox(
+            height: 380,
+            child: PageView.builder(
+              itemCount: _seriesOptions.length,
+              onPageChanged: (index) => setState(() => _selectedSeriesIndex = index),
+              itemBuilder: (context, index) {
+                final series = _seriesOptions[index];
+                return AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: _selectedSeriesIndex == index ? 1.0 : 0.5,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(
+                        color: _selectedSeriesIndex == index 
+                          ? series['color'].withOpacity(0.5) 
+                          : Colors.white10,
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: series['color'].withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            series['tag'],
+                            style: TextStyle(color: series['color'], fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          series['name'],
+                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
+                        ),
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Hero(
+                            tag: 'box_${series['name']}',
+                            child: Icon(Icons.inventory_2, size: 150, color: series['color']),
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
           Consumer<AppState>(
             builder: (context, appState, child) {
               return Column(
@@ -518,31 +591,25 @@ class _DashboardPageState extends State<DashboardPage> {
                     animation: true,
                     animateFromLastPercent: true,
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildAvatarAction(
-                          appState.availableBoxes > 0 
-                            ? "Open Box (${appState.availableBoxes})" 
-                            : "Open Blind Box",
-                          Icons.card_giftcard,
-                          appState.availableBoxes > 0 
-                            ? () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const BlindBoxPage()),
-                                );
-                              }
-                            : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
-                          isHighlight: appState.availableBoxes > 0,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildAvatarAction("Customize Face", Icons.face_retouching_natural, () => _showFunctionalityToast("AI Customization")),
-                      ),
-                    ],
+                  const SizedBox(height: 24),
+                  _buildAvatarAction(
+                    appState.availableBoxes > 0 
+                      ? "Open ${_seriesOptions[_selectedSeriesIndex]['name']} (${appState.availableBoxes})" 
+                      : "Open Series",
+                    Icons.card_giftcard,
+                    appState.availableBoxes > 0 
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlindBoxPage(
+                                seriesName: _seriesOptions[_selectedSeriesIndex]['name'],
+                              ),
+                            ),
+                          );
+                        }
+                      : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
+                    isHighlight: appState.availableBoxes > 0,
                   ),
                 ],
               );

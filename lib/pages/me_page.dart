@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../widgets/avatar_viewer.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
-import 'avatar_creator_page.dart';
 import 'package:animate_do/animate_do.dart';
 
 class MePage extends StatelessWidget {
@@ -21,32 +20,6 @@ class MePage extends StatelessWidget {
               FadeInDown(
                 child: AvatarViewer(
                   modelUrl: appState.avatarUrl,
-                  height: 210,
-                  width: 152,
-                ),
-              ),
-              const SizedBox(height: 16),
-              FadeInUp(
-                child: TextButton.icon(
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AvatarCreatorPage()),
-                    );
-                    if (result != null && result is String) {
-                      appState.updateAvatarUrl(result);
-                    }
-                  },
-                  icon: const Icon(Icons.camera_alt, color: GoXeyColors.neonLime, size: 18),
-                  label: const Text(
-                    "Face Scan for 3D Avatar",
-                    style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold),
-                  ),
-                  style: TextButton.styleFrom(
-                    backgroundColor: GoXeyColors.neonLime.withOpacity(0.1),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
                 ),
               ),
               const SizedBox(height: 24),
