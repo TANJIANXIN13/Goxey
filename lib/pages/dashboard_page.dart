@@ -15,6 +15,7 @@ import 'blind_box_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'me_page.dart';
 import 'squad_pockets_page.dart';
+import '../core/pocket_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -458,43 +459,63 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildAccountsSection(bool isGoxey, double totalBalance, double pocketsBalance) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<PocketProvider>(
+      builder: (context, pocketProvider, _) {
+        final pockets = pocketProvider.pockets;
+        // Build all cards: Main Account + one per pocket
+        final cards = <Widget>[
+          _buildAccountCard("Main Account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey, members: []),
+          ...pockets.map((p) => _buildAccountCard(
+            p.name,
+            "RM${p.saved.toStringAsFixed(2)} / RM${p.target.toStringAsFixed(2)}",
+            "${(p.saved / p.target * 100).clamp(0, 100).toStringAsFixed(0)}% saved",
+            isGoxey,
+            members: p.members,
+          )),
+        ];
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Your everyday account",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Your everyday account",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Row(children: [
+                    const Icon(Icons.swipe, color: Colors.white38, size: 16),
+                    const SizedBox(width: 4),
+                    Text("${cards.length} accounts", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                  ]),
+                ],
               ),
-              Icon(Icons.credit_card, color: Colors.white54, size: 20),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _buildAccountCard("Main account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  onTap: isGoxey ? _showPocketMoneyDialog : () => _showFunctionalityToast("Pockets"),
-                  child: _buildAccountCard("Pockets", "RM${pocketsBalance.toStringAsFixed(2)}", "Up to 3.55% p.a.", isGoxey),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: PageView.builder(
+                  controller: PageController(viewportFraction: 0.88),
+                  itemCount: cards.length,
+                  itemBuilder: (context, i) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: cards[i],
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildAccountCard(String title, String balance, String? promo, bool isGoxey) {
+  Widget _buildAccountCard(String title, String balance, String? promo, bool isGoxey, {List<String> members = const []}) {
     return Container(
       padding: const EdgeInsets.all(16),
-      height: 180,
+      height: 200,
       decoration: BoxDecoration(
         color: isGoxey ? null : GoXeyColors.gxDarkCard,
         gradient: isGoxey ? const LinearGradient(
@@ -512,7 +533,7 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 8),
           Text(
             balance,
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           if (promo != null) ...[
             const SizedBox(height: 8),
@@ -528,8 +549,24 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
           ],
+          if (members.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.people_outline, color: Colors.white38, size: 13),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    "Me, ${members.join(', ')}",
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
           const Spacer(),
-          if (title == "Main account")
+          if (title == "Main Account")
             const Text(
               "View transactions",
               style: TextStyle(color: Colors.white54, fontSize: 10),

@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
+import '../core/pocket_provider.dart';
 import '../widgets/avatar_viewer.dart';
 import 'blind_box_page.dart';
 import 'showcase_page.dart';
@@ -23,6 +24,13 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
     {"name": "Chloe", "avatar": "assets/avatars/avatar_5.jpg", "isMe": false, "status": "ACTIVE"},
     {"name": "Ethan", "avatar": "assets/avatars/avatar_4.jpg", "isMe": false, "status": "GHOST"},
   ];
+
+  final Map<String, String> _seriesStats = {
+    "CRYBABY SERIES": "5/10",
+    "SKULLPANDA": "3/10",
+    "DIMOO": "3/10",
+    "TWINKLE TWINKLE": "3/10",
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -359,46 +367,46 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     // Avatar Stage
                     Container(
                       width: 140,
-                      height: 35,
+                      height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C35),
-                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xFF1E1E24),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 15,
-                            offset: const Offset(0, 10),
+                            color: Colors.black.withOpacity(0.6),
+                            blurRadius: 12,
+                            offset: const Offset(0, 8),
                           )
                         ],
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1,
-                        ),
                       ),
-                      child: Stack(
-                        children: [
-                          // Neon line
-                          Positioned(
-                            top: 6, // creates a top surface illusion
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              height: 2,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [GoXeyColors.gxCyan, GoXeyColors.radicalRed],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: GoXeyColors.gxCyan.withOpacity(0.5),
-                                    blurRadius: 4,
-                                    spreadRadius: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Stack(
+                          children: [
+                            // Neon glowing edge
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height: 3,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [GoXeyColors.gxCyan, GoXeyColors.radicalRed],
                                   ),
-                                ],
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: GoXeyColors.gxCyan.withOpacity(0.8),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     // Avatar
@@ -501,75 +509,59 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
   Widget _buildShelf(int number, String title) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20), // Exact margin for calculation
-      height: 55, // Exact height for calculation
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(12),
-        border: Border(
-          top: BorderSide(color: GoXeyColors.neonLime.withOpacity(0.4), width: 1.5),
-          bottom: BorderSide(color: Colors.black.withOpacity(0.8), width: 2),
-          left: BorderSide(color: Colors.white.withOpacity(0.05)),
-          right: BorderSide(color: Colors.white.withOpacity(0.05)),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: GoXeyColors.gxCyan.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.6),
-            blurRadius: 10,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      margin: const EdgeInsets.only(bottom: 25), 
+      height: 50,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 3D Glass Surface Reflection
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacity(0.15),
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.05),
-                  ],
-                  stops: const [0.0, 0.3, 0.7, 1.0],
-                ),
-              ),
-            ),
-          ),
+          // Shelf Title and figurines
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.only(bottom: 2),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: Text(
                     "SHELF $number: $title",
-                    style: const TextStyle(
-                      fontSize: 11,
+                    style: TextStyle(
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.white.withOpacity(0.8),
                       letterSpacing: 0.5,
-                      shadows: [
-                        Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(1, 1)),
-                      ],
                     ),
                   ),
                 ),
                 if (title.contains("DIMOO")) ...[
-                  Image.asset("assets/avatars/avatar_3.jpg", height: 35, width: 35, fit: BoxFit.contain),
-                  const SizedBox(width: 4),
-                  Image.asset("assets/avatars/avatar_5.jpg", height: 35, width: 35, fit: BoxFit.contain),
+                  ...["assets/avatars/dimoo/dimoo_1.png", "assets/avatars/dimoo/dimoo_2.png", "assets/avatars/dimoo/dimoo_3.png"].map(
+                    (path) => Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Image.asset(path, height: 45, width: 28, fit: BoxFit.contain),
+                    ),
+                  ),
+                ] else if (title.contains("CRYBABY")) ...[
+                   const Icon(Icons.star, color: Colors.amber, size: 20),
+                   const Icon(Icons.star, color: Colors.amber, size: 20),
+                ] else ...[
+                  const Icon(Icons.lock_outline, color: Colors.white12, size: 18),
                 ],
+                const SizedBox(width: 10),
+                // Owned Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: GoXeyColors.neonLime.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    "OWNED: ${_seriesStats[title] ?? '0/10'}",
+                    style: const TextStyle(
+                      color: GoXeyColors.neonLime,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -656,66 +648,93 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
   }
 
   void _showCreatePocketDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final targetController = TextEditingController();
+    final List<String> selectedMembers = [];
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Create Shared Pocket", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Pocket Name (e.g. Bali Trip)",
-                hintStyle: const TextStyle(color: Colors.white24),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Target Amount (RM)",
-                hintStyle: const TextStyle(color: Colors.white24),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
-              style: const TextStyle(color: Colors.white),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: () => _showFriendSelectionDialog(context),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.person_add, color: GoXeyColors.neonLime, size: 20),
-                    const SizedBox(width: 8),
-                    const Text("Select Friends/Family to Add", style: TextStyle(color: GoXeyColors.neonLime)),
-                  ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDlgState) => AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text("Create Shared Pocket", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  controller: nameController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Pocket Name (e.g. Bali Trip)",
+                    hintStyle: const TextStyle(color: Colors.white24),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.05),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: targetController,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: "Target Amount (RM)",
+                    prefixText: "RM ",
+                    prefixStyle: const TextStyle(color: GoXeyColors.neonLime),
+                    hintStyle: const TextStyle(color: Colors.white24),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.05),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text("Invite Members", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                ...["Liam – 1029384756 (Maybank)", "Chloe – 5647382910 (CIMB)", "Ethan – 9988776655 (Public Bank)"].map((friend) {
+                  final name = friend.split(' ')[0];
+                  final isSelected = selectedMembers.contains(name);
+                  return ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(backgroundColor: Colors.white10, radius: 16, child: const Icon(Icons.person, color: Colors.white54, size: 16)),
+                    title: Text(friend, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                    trailing: GestureDetector(
+                      onTap: () => setDlgState(() {
+                        if (isSelected) selectedMembers.remove(name); else selectedMembers.add(name);
+                      }),
+                      child: Icon(isSelected ? Icons.check_circle : Icons.add_circle_outline, color: isSelected ? GoXeyColors.neonLime : Colors.white38),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () { Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invite link copied!"), backgroundColor: GoXeyColors.neonLime)); },
+                  icon: const Icon(Icons.share, size: 18, color: Colors.white),
+                  label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+            ElevatedButton(
+              onPressed: () {
+                final name = nameController.text.trim();
+                final target = double.tryParse(targetController.text) ?? 0;
+                if (name.isNotEmpty && target > 0) {
+                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, List.from(selectedMembers));
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"$name" pocket created! 🚀'), backgroundColor: GoXeyColors.neonLime));
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: const Text("Create"),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Shared pocket created successfully! 🚀"), backgroundColor: GoXeyColors.neonLime),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            child: const Text("Create"),
-          ),
-        ],
       ),
     );
   }
@@ -877,49 +896,49 @@ class RackPainter extends CustomPainter {
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
 
     final path = Path();
+
+    double shelfXStart = size.width * 0.45; 
+    double shelfXEnd = size.width; 
     
-    // Constants for positions based on layout
-    // Top padding of shelves column = 15
-    // Shelf height = 55, Margin bottom = 20
-    double shelfXStart = size.width * 0.48; // Left edge of shelves
-    double shelfXEnd = size.width; // Right edge of shelves
-    
+    // Y positions of the shelf lines
     List<double> shelfYLines = [
-      15 + 55.0,           // Shelf 1 bottom
-      15 + 55.0 + 20 + 55, // Shelf 2 bottom
-      15 + (55.0 + 20) * 2 + 55, // Shelf 3 bottom
-      15 + (55.0 + 20) * 3 + 55, // Shelf 4 bottom
+      15 + 50.0,           
+      15 + 50.0 + 25 + 50, 
+      15 + (50.0 + 25) * 2 + 50, 
+      15 + (50.0 + 25) * 3 + 50, 
     ];
 
-    // Draw horizontal lines for all shelves
     for (int i = 0; i < 4; i++) {
+      // Horizontal shelf line
       path.moveTo(shelfXStart, shelfYLines[i]);
       path.lineTo(shelfXEnd, shelfYLines[i]);
       
-      // For top 3 shelves, draw the curved left end
-      if (i < 3) {
-        path.moveTo(shelfXStart, shelfYLines[i]);
-        path.quadraticBezierTo(
-          shelfXStart - 10, shelfYLines[i], 
-          shelfXStart - 10, shelfYLines[i] + 10
-        );
-      }
+      // Right vertical cap for each shelf
+      path.moveTo(shelfXEnd, shelfYLines[i]);
+      path.lineTo(shelfXEnd, shelfYLines[i] - 15);
+      
+      // Upward curve at left end
+      path.moveTo(shelfXStart, shelfYLines[i]);
+      path.quadraticBezierTo(
+        shelfXStart - 12, shelfYLines[i], 
+        shelfXStart - 12, shelfYLines[i] - 12
+      );
     }
 
-    // Draw S-curve for the bottom shelf (Shelf 4)
-    double stageBottomY = 25 + 190 + 15 + 35; // Top + Avatar + spacing + Stage
-    double stageRightX = size.width * 0.35; // Roughly right edge of stage
+    // Right vertical spine connecting the caps (aesthetic)
+    path.moveTo(shelfXEnd, shelfYLines[0] - 15);
+    path.lineTo(shelfXEnd, shelfYLines[3]);
+
+    // Connecting curve from avatar stage
+    double stageBottomY = 25 + 230 + 15; 
+    double stageRightX = 140; 
     
-    path.moveTo(stageRightX, stageBottomY - 10);
+    path.moveTo(stageRightX, stageBottomY);
     path.cubicTo(
-      stageRightX + 20, stageBottomY - 10,
-      shelfXStart - 20, shelfYLines[3],
+      stageRightX + 30, stageBottomY,
+      shelfXStart - 30, shelfYLines[3],
       shelfXStart, shelfYLines[3],
     );
-
-    // Vertical rack line on the right connecting all shelves
-    path.moveTo(shelfXEnd, shelfYLines[0] - 20); // slightly above top shelf
-    path.lineTo(shelfXEnd, shelfYLines[3] + 20); // slightly below bottom shelf
 
     canvas.drawPath(path, glowPaint);
     canvas.drawPath(path, paint);

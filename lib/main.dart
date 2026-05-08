@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'core/app_state.dart';
 import 'core/budget_provider.dart';
+import 'core/pocket_provider.dart';
 import 'pages/dashboard_page.dart';
 
 void main() {
@@ -11,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => AppState()),
         ChangeNotifierProvider(create: (context) => BudgetProvider()),
+        ChangeNotifierProvider(create: (context) => PocketProvider()),
       ],
       child: const GoXeyApp(),
     ),
