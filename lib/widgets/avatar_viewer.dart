@@ -7,12 +7,14 @@ class AvatarViewer extends StatelessWidget {
   final String? modelUrl;
   final double height;
   final double? width;
+  final bool showBackground;
   
   const AvatarViewer({
     super.key, 
     this.modelUrl,
     this.height = 220,
     this.width,
+    this.showBackground = true,
   });
 
   @override
@@ -27,11 +29,11 @@ class AvatarViewer extends StatelessWidget {
     return Container(
       width: width ?? double.infinity,
       height: height,
-      decoration: BoxDecoration(
+      decoration: showBackground ? BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(color: Colors.white10),
-      ),
+      ) : null,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: _buildAvatar(url, isAsset, isGlb),

@@ -4,7 +4,6 @@ import '../widgets/avatar_viewer.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
 import 'avatar_creator_page.dart';
-import 'squad_pockets_page.dart';
 import 'package:animate_do/animate_do.dart';
 
 class MePage extends StatelessWidget {
@@ -86,18 +85,6 @@ class MePage extends StatelessWidget {
               ),
               _buildProfileOption(Icons.security, "Security & Privacy"),
               _buildProfileOption(Icons.card_giftcard, "Blind Box Collection"),
-              _buildProfileOption(
-                Icons.people_outline,
-                "Squad Settings",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SquadPocketsPage(),
-                    ),
-                  );
-                },
-              ),
               const SizedBox(height: 40),
               TextButton(
                 onPressed: () {},

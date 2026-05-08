@@ -8,55 +8,54 @@ class SquadPocketsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: GoXeyColors.blackRussian,
-      appBar: AppBar(
-        title: const Text(
-          "Squad Settings",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Your Pocket Banks",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70,
-              ),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "YOUR SQUAD POCKETS",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
             ),
-            const SizedBox(height: 20),
-            FadeInLeft(
-              child: _buildPocketCard(
-                context,
-                title: "Langkawi Trip Fund",
-                saved: "RM2150",
-                target: "RM5000",
-                members: 4,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SquadDetailPage(),
-                    ),
-                  );
-                },
-              ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Shared savings with your squad",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white54,
             ),
-            const SizedBox(height: 20),
-            FadeInUp(
-              delay: const Duration(milliseconds: 200),
-              child: _buildAddPocketCard(context),
+          ),
+          const SizedBox(height: 30),
+          FadeInLeft(
+            child: _buildPocketCard(
+              context,
+              title: "Langkawi Trip Fund",
+              saved: "RM2150",
+              target: "RM5000",
+              members: 4,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SquadDetailPage(),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          FadeInUp(
+            delay: const Duration(milliseconds: 200),
+            child: _buildAddPocketCard(context),
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }

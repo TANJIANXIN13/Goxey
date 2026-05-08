@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:provider/provider.dart';
 import '../core/theme.dart';
+import '../core/app_state.dart';
 import '../widgets/avatar_viewer.dart';
+import 'blind_box_page.dart';
 
-class SquadDetailPage extends StatelessWidget {
+class SquadDetailPage extends StatefulWidget {
   const SquadDetailPage({super.key});
+
+  @override
+  State<SquadDetailPage> createState() => _SquadDetailPageState();
+}
+
+class _SquadDetailPageState extends State<SquadDetailPage> {
+  int _currentCollectionIndex = 0;
+
+  final List<Map<String, dynamic>> _squadMembers = [
+    {"name": "Me", "avatar": "assets/avatars/avatar_3.jpg", "isMe": true},
+    {"name": "Liam", "avatar": "assets/avatars/avatar_2.jpg", "isMe": false},
+    {"name": "Chloe", "avatar": "assets/avatars/avatar_5.jpg", "isMe": false},
+    {"name": "Ethan", "avatar": "assets/avatars/avatar_4.jpg", "isMe": false},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -141,16 +158,16 @@ class SquadDetailPage extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _buildSquadMember(
-          name: "User 1",
+          name: "Me",
           subtitle: "Contribution raotive avatar",
-          avatarPath: "assets/avatars/avatar_1.jpg",
+          avatarPath: "assets/avatars/avatar_3.jpg",
           status: "ON TRACK",
           statusColor: GoXeyColors.neonLime,
           badge: "GUEST",
           badgeColor: Colors.white24,
         ),
         _buildSquadMember(
-          name: "User 2",
+          name: "Liam",
           subtitle: "Skullpanda figure as avatar",
           avatarPath: "assets/avatars/avatar_2.jpg",
           amount: "RM800",
@@ -158,15 +175,15 @@ class SquadDetailPage extends StatelessWidget {
           statusColor: GoXeyColors.neonLime,
         ),
         _buildSquadMember(
-          name: "User 3",
+          name: "Chloe",
           subtitle: "Dimoo figure as avatar",
-          avatarPath: "assets/avatars/avatar_3.jpg",
+          avatarPath: "assets/avatars/avatar_5.jpg",
           amount: "RM550",
           status: "ACTIVE",
           statusColor: GoXeyColors.neonLime,
         ),
         _buildSquadMember(
-          name: "User 4 (other IP)",
+          name: "Ethan",
           subtitle: "Contribution inozin avatar",
           avatarPath: "assets/avatars/avatar_4.jpg",
           amount: "RM450",
@@ -271,9 +288,9 @@ class SquadDetailPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "YOUR COLLECTION (USER'S)",
-              style: TextStyle(
+            Text(
+              _currentCollectionIndex == 0 ? "YOUR COLLECTION" : "${_squadMembers[_currentCollectionIndex]['name'].toUpperCase()}'S COLLECTION",
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
@@ -282,9 +299,9 @@ class SquadDetailPage extends StatelessWidget {
             ),
             Row(
               children: [
-                _buildSmallButton("Showcase to Squad"),
+                _buildSmallButton("Showcase to Squad", onTap: () => _showShowcaseDialog(context)),
                 const SizedBox(width: 8),
-                _buildSmallButton("Redeem New Box"),
+                _buildSmallButton("Redeem New Box", onTap: () => _redeemNewBox(context)),
               ],
             ),
           ],
@@ -305,37 +322,11 @@ class SquadDetailPage extends StatelessWidget {
                 left: 0,
                 top: 25,
                 width: MediaQuery.of(context).size.width * 0.4,
-                child: Column(
+                height: 250,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  clipBehavior: Clip.none,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
-                        ),
-                        const SizedBox(width: 8),
-                        const AvatarViewer(
-                          modelUrl: "assets/avatars/avatar_1.jpg",
-                          height: 190,
-                          width: 120,
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.chevron_right, color: Colors.white, size: 24),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
                     // Avatar Stage
                     Container(
                       width: 140,
@@ -381,6 +372,57 @@ class SquadDetailPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    // Avatar
+                    Positioned(
+                      bottom: 25,
+                      child: AvatarViewer(
+                        modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
+                        height: 210,
+                        width: 120,
+                        showBackground: false,
+                      ),
+                    ),
+                    // Left arrow
+                    Positioned(
+                      left: 0,
+                      top: 100,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _currentCollectionIndex = (_currentCollectionIndex - 1) % _squadMembers.length;
+                            if (_currentCollectionIndex < 0) _currentCollectionIndex += _squadMembers.length;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
+                        ),
+                      ),
+                    ),
+                    // Right arrow
+                    Positioned(
+                      right: 0,
+                      top: 100,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _currentCollectionIndex = (_currentCollectionIndex + 1) % _squadMembers.length;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.chevron_right, color: Colors.white, size: 24),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -391,10 +433,10 @@ class SquadDetailPage extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.52,
                 child: Column(
                   children: [
-                    _buildShelf(1, "CRYBABY SERIES", "assets/series/crybaby.jpg", 5),
-                    _buildShelf(2, "SKULLPANDA", "assets/series/skullpanda.jpg", 3),
-                    _buildShelf(3, "DIMOO", "assets/series/dimoo.jpg", 3),
-                    _buildShelf(4, "TWINKLE TWINKLE", "assets/series/twinkle.jpg", 3),
+                    _buildShelf(1, "CRYBABY SERIES"),
+                    _buildShelf(2, "SKULLPANDA"),
+                    _buildShelf(3, "DIMOO"),
+                    _buildShelf(4, "TWINKLE TWINKLE"),
                   ],
                 ),
               ),
@@ -404,16 +446,16 @@ class SquadDetailPage extends StatelessWidget {
         const SizedBox(height: 25),
         Row(
           children: [
-            Expanded(child: _buildMainButton("Showcase to Squad", isPrimary: false)),
+            Expanded(child: _buildMainButton("Showcase to Squad", isPrimary: false, onTap: () => _showShowcaseDialog(context))),
             const SizedBox(width: 12),
-            Expanded(child: _buildMainButton("Redeem New Box", isPrimary: true)),
+            Expanded(child: _buildMainButton("Redeem New Box", isPrimary: true, onTap: () => _redeemNewBox(context))),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildShelf(int number, String title, String asset, int owned) {
+  Widget _buildShelf(int number, String title) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20), // Exact margin for calculation
       height: 55, // Exact height for calculation
@@ -469,24 +511,6 @@ class SquadDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Image.asset(asset, height: 38, width: 38, fit: BoxFit.contain),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: GoXeyColors.neonLime.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    "OWNED: $owned/10",
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: GoXeyColors.neonLime,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -495,47 +519,125 @@ class SquadDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSmallButton(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 10, color: Colors.white70),
+  Widget _buildSmallButton(String text, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 10, color: Colors.white70),
+        ),
       ),
     );
   }
 
-  Widget _buildMainButton(String text, {required bool isPrimary}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        color: isPrimary ? GoXeyColors.radicalRed : Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isPrimary ? Colors.transparent : Colors.white10),
-        boxShadow: isPrimary
-            ? [
-                BoxShadow(
-                  color: GoXeyColors.radicalRed.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                )
-              ]
-            : [],
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            color: isPrimary ? Colors.white : Colors.white70,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+  Widget _buildMainButton(String text, {required bool isPrimary, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isPrimary ? GoXeyColors.radicalRed : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isPrimary ? Colors.transparent : Colors.white10),
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: GoXeyColors.radicalRed.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  )
+                ]
+              : [],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isPrimary ? Colors.white : Colors.white70,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _redeemNewBox(BuildContext context) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    if (appState.availableBoxes > 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BlindBoxPage(seriesName: "Dimoo"),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Save RM 200 more to unlock!"),
+          backgroundColor: GoXeyColors.accentPurple,
+        ),
+      );
+    }
+  }
+
+  void _showShowcaseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Milestone Reached 🎉", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("You've contributed RM500 this week!", style: TextStyle(color: GoXeyColors.neonLime, fontSize: 16)),
+            const SizedBox(height: 20),
+            const Text("Collection Status", style: TextStyle(color: Colors.white70, fontSize: 14)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+              child: const Row(
+                children: [
+                  Icon(Icons.inventory_2, color: Colors.white54),
+                  SizedBox(width: 12),
+                  Text("5/10 Crybaby characters", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close", style: TextStyle(color: Colors.white38)),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Shared to IG Story! 📸"), backgroundColor: GoXeyColors.gxPurple),
+              );
+            },
+            icon: const Icon(Icons.share, size: 16),
+            label: const Text("Share to IG/Story"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GoXeyColors.radicalRed,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
       ),
     );
   }

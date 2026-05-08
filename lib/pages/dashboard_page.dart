@@ -14,6 +14,7 @@ import 'history_page.dart';
 import 'blind_box_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'me_page.dart';
+import 'squad_pockets_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -186,7 +187,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   children: [
                     _buildHomeContent(isGoxey, appState),
                     HistoryPage(isActive: _currentIndex == 1),
-                    const Center(child: Text("Discover Page", style: TextStyle(color: Colors.white))),
+                    const SquadPocketsPage(),
                     const MePage(),
                   ],
                 ),
