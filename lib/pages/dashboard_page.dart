@@ -184,7 +184,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   index: _currentIndex,
                   children: [
                     _buildHomeContent(isGoxey, appState),
-                    const HistoryPage(),
+                    HistoryPage(isActive: _currentIndex == 1),
                     const Center(child: Text("Discover Page", style: TextStyle(color: Colors.white))),
                     const MePage(),
                   ],

@@ -3,10 +3,167 @@ import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
 import 'package:animate_do/animate_do.dart';
-import '../widgets/glass_container.dart';
 
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
+class HistoryPage extends StatefulWidget {
+  final bool isActive;
+  const HistoryPage({super.key, this.isActive = false});
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  @override
+  void didUpdateWidget(covariant HistoryPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showSpendSummaryDialog(context);
+      });
+    }
+  }
+
+  void _showSpendSummaryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF090D16), // Dark blue that seems like black
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        contentPadding: const EdgeInsets.all(28),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Upper part
+            const Text(
+              "Today...",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Middle part
+            const Text(
+              "Congratulations, today you paid RM18.50 for a cup of sugary coffee and a misspelled name. ☕",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                height: 1.5,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 32),
+            // 100% Stacked Bar Chart
+            Container(
+              height: 16,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 15,
+                      child: Container(color: GoXeyColors.neonLime),
+                    ),
+                    Expanded(
+                      flex: 50,
+                      child: Container(color: Colors.cyanAccent),
+                    ),
+                    Expanded(
+                      flex: 13,
+                      child: Container(color: Colors.yellowAccent),
+                    ),
+                    Expanded(
+                      flex: 22,
+                      child: Container(color: Colors.orangeAccent),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Legends under the bar
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLegendItem(Icons.local_cafe, "Coffee", "15%", GoXeyColors.neonLime),
+                _buildLegendItem(Icons.games, "Gaming", "50%", Colors.cyanAccent),
+                _buildLegendItem(Icons.directions_car, "Ride", "13%", Colors.yellowAccent),
+                _buildLegendItem(Icons.shopping_bag, "Shop", "22%", Colors.orangeAccent),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Got It button
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: double.infinity,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF9D00F2),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF9D00F2).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Text(
+                    "Got it",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(IconData icon, String label, String percentage, Color color) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(icon, color: Colors.white38, size: 14),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          percentage,
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +298,6 @@ class HistoryPage extends StatelessWidget {
                     color: (tx["color"] as Color).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(tx["icon"] as IconData, color: tx["color"] as Color, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -250,7 +406,6 @@ class _ChartPainter extends CustomPainter {
 
     path.moveTo(points[0].dx, points[0].dy);
     for (int i = 1; i < points.length; i++) {
-      // Smooth curves
       final p0 = points[i - 1];
       final p1 = points[i];
       final controlPoint1 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p0.dy);
@@ -266,7 +421,6 @@ class _ChartPainter extends CustomPainter {
     canvas.drawPath(fillPath, fillPaint);
     canvas.drawPath(path, paint);
 
-    // Draw dots
     final dotPaint = Paint()..color = Colors.white;
     for (var p in points) {
       canvas.drawCircle(p, 4, dotPaint);
