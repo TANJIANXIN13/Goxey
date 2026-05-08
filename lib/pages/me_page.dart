@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../widgets/avatar_viewer.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
-import 'avatar_creator_page.dart';
 import 'package:animate_do/animate_do.dart';
 
 class MePage extends StatelessWidget {
@@ -20,6 +19,7 @@ class MePage extends StatelessWidget {
               const SizedBox(height: 20),
               FadeInDown(
                 child: AvatarViewer(
+<<<<<<< HEAD
                   modelUrl: appState.hasCreatedAvatar
                       ? appState.avatarUrl
                       : "assets/avatars/goxey_placeholder.png",
@@ -49,6 +49,9 @@ class MePage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
+=======
+                  modelUrl: appState.avatarUrl,
+>>>>>>> 8fd2bc546e14cd2c4436efac9610e807058ca849
                 ),
               ),
               const SizedBox(height: 24),
