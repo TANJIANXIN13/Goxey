@@ -675,14 +675,17 @@ class _DashboardPageState extends State<DashboardPage> {
                     Icons.card_giftcard,
                     appState.availableBoxes > 0 
                       ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlindBoxPage(
-                                seriesName: _seriesOptions[_selectedSeriesIndex]['name'],
+                          final seriesName = _seriesOptions[_selectedSeriesIndex]['name'];
+                          if (seriesName == "Dimoo") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlindBoxPage(seriesName: seriesName),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            _showFunctionalityToast("$seriesName Coming Soon");
+                          }
                         }
                       : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
                     isHighlight: appState.availableBoxes > 0,
