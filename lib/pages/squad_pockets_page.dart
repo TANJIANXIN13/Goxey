@@ -189,7 +189,7 @@ class SquadPocketsPage extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          // Add Pocket Logic
+          _showCreatePocketDialog(context);
         },
         borderRadius: BorderRadius.circular(24),
         child: const Column(
@@ -207,6 +207,145 @@ class SquadPocketsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showCreatePocketDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Create Shared Pocket", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Pocket Name (e.g. Bali Trip)",
+                hintStyle: const TextStyle(color: Colors.white24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Target Amount (RM)",
+                hintStyle: const TextStyle(color: Colors.white24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: () => _showFriendSelectionDialog(context),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_add, color: GoXeyColors.neonLime, size: 20),
+                    const SizedBox(width: 8),
+                    const Text("Select Friends/Family to Add", style: TextStyle(color: GoXeyColors.neonLime)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Shared pocket created successfully! 🚀"), backgroundColor: GoXeyColors.neonLime),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            child: const Text("Create"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFriendSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Select Friends", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "Search bank account number of friend/family member",
+                  hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white24),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
+                    _buildFriendItem(context, "Chloe", "5647382910 (CIMB)"),
+                    _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
+                  );
+                },
+                icon: const Icon(Icons.share, size: 18, color: Colors.white),
+                label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.white24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Done", style: TextStyle(color: GoXeyColors.neonLime))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendItem(BuildContext context, String name, String details) {
+    return ListTile(
+      leading: CircleAvatar(backgroundColor: Colors.white10, child: const Icon(Icons.person, color: Colors.white54)),
+      title: Text(name, style: const TextStyle(color: Colors.white)),
+      subtitle: Text(details, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+      trailing: const Icon(Icons.add_circle_outline, color: GoXeyColors.neonLime),
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$name added!"), backgroundColor: GoXeyColors.gxPurple, duration: const Duration(seconds: 1)),
+        );
+      },
     );
   }
 }

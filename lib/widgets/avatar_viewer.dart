@@ -34,16 +34,35 @@ class AvatarViewer extends StatelessWidget {
         borderRadius: BorderRadius.circular(32),
         border: Border.all(color: Colors.white10),
       ) : null,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
-        child: _buildAvatar(url, isAsset, isGlb),
-      ),
+      child: showBackground 
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: _buildAvatar(url, isAsset, isGlb),
+          )
+        : _buildAvatar(url, isAsset, isGlb),
     );
   }
 
   Widget _buildAvatar(String url, bool isAsset, bool isGlb) {
+    Widget avatar;
     if (isAsset) {
-      return Image.asset(
+      avatar = Image.asset(
+        url,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Icon(Icons.person, size: 100, color: Colors.white24),
+        ),
+      );
+    } else if (isGlb) {
+      avatar = ModelViewer(
+        src: url,
+        alt: "A 3D model of an avatar",
+        autoRotate: true,
+        cameraControls: true,
+        backgroundColor: Colors.transparent,
+      );
+    } else {
+      avatar = Image.network(
         url,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) => const Center(
@@ -52,22 +71,28 @@ class AvatarViewer extends StatelessWidget {
       );
     }
 
-    if (isGlb) {
-      return ModelViewer(
-        src: url,
-        alt: "A 3D model of an avatar",
-        autoRotate: true,
-        cameraControls: true,
-        backgroundColor: Colors.transparent,
+    if (!showBackground && isAsset) {
+      // Apply a subtle shader mask to fade edges and help 'crop' the avatar people 
+      // from their rectangular image backgrounds
+      return ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0),
+              Colors.black,
+              Colors.black,
+              Colors.black.withOpacity(0),
+            ],
+            stops: const [0.0, 0.1, 0.9, 1.0],
+          ).createShader(rect);
+        },
+        blendMode: BlendMode.dstIn,
+        child: avatar,
       );
     }
 
-    return Image.network(
-      url,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) => const Center(
-        child: Icon(Icons.person, size: 100, color: Colors.white24),
-      ),
-    );
+    return avatar;
   }
 }

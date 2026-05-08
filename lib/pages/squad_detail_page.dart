@@ -5,6 +5,7 @@ import '../core/theme.dart';
 import '../core/app_state.dart';
 import '../widgets/avatar_viewer.dart';
 import 'blind_box_page.dart';
+import 'showcase_page.dart';
 
 class SquadDetailPage extends StatefulWidget {
   const SquadDetailPage({super.key});
@@ -17,10 +18,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
   int _currentCollectionIndex = 0;
 
   final List<Map<String, dynamic>> _squadMembers = [
-    {"name": "Me", "avatar": "assets/avatars/avatar_3.jpg", "isMe": true},
-    {"name": "Liam", "avatar": "assets/avatars/avatar_2.jpg", "isMe": false},
-    {"name": "Chloe", "avatar": "assets/avatars/avatar_5.jpg", "isMe": false},
-    {"name": "Ethan", "avatar": "assets/avatars/avatar_4.jpg", "isMe": false},
+    {"name": "Me", "avatar": "assets/avatars/avatar_3.jpg", "isMe": true, "status": "ACTIVE"},
+    {"name": "Liam", "avatar": "assets/avatars/avatar_2.jpg", "isMe": false, "status": "ACTIVE"},
+    {"name": "Chloe", "avatar": "assets/avatars/avatar_5.jpg", "isMe": false, "status": "ACTIVE"},
+    {"name": "Ethan", "avatar": "assets/avatars/avatar_4.jpg", "isMe": false, "status": "GHOST"},
   ];
 
   @override
@@ -102,6 +103,19 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
             const Text(
               "SHARED SAVING: 2.5K/5K",
               style: TextStyle(fontSize: 12, color: Colors.white54),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => _showAddFriendsDialog(context),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: GoXeyColors.neonLime.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
+                ),
+                child: const Icon(Icons.add, size: 14, color: GoXeyColors.neonLime),
+              ),
             ),
           ],
         ),
@@ -206,15 +220,37 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
     String? badge,
     Color? badgeColor,
   }) {
+    bool isGhost = status == "GHOST";
+
+    Widget avatarWidget = SizedBox(
+      width: 48,
+      height: 48,
+      child: AvatarViewer(
+        modelUrl: avatarPath,
+        height: 48,
+        width: 48,
+        showBackground: false,
+      ),
+    );
+
+    if (isGhost) {
+      avatarWidget = ColorFiltered(
+        colorFilter: const ColorFilter.matrix([
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0,      0,      0,      1, 0,
+        ]),
+        child: avatarWidget,
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: AssetImage(avatarPath),
-          ),
+          avatarWidget,
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -297,13 +333,6 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                 color: Colors.white,
               ),
             ),
-            Row(
-              children: [
-                _buildSmallButton("Showcase to Squad", onTap: () => _showShowcaseDialog(context)),
-                const SizedBox(width: 8),
-                _buildSmallButton("Redeem New Box", onTap: () => _redeemNewBox(context)),
-              ],
-            ),
           ],
         ),
         const SizedBox(height: 30),
@@ -374,13 +403,28 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     ),
                     // Avatar
                     Positioned(
-                      bottom: 25,
-                      child: AvatarViewer(
-                        modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
-                        height: 210,
-                        width: 120,
-                        showBackground: false,
-                      ),
+                      bottom: 12,
+                      child: _squadMembers[_currentCollectionIndex]['status'] == "GHOST"
+                        ? ColorFiltered(
+                            colorFilter: const ColorFilter.matrix([
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0.2126, 0.7152, 0.0722, 0, 0,
+                              0,      0,      0,      1, 0,
+                            ]),
+                            child: AvatarViewer(
+                              modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
+                              height: 230,
+                              width: 140,
+                              showBackground: false,
+                            ),
+                          )
+                        : AvatarViewer(
+                            modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
+                            height: 230,
+                            width: 140,
+                            showBackground: false,
+                          ),
                     ),
                     // Left arrow
                     Positioned(
@@ -460,35 +504,45 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       margin: const EdgeInsets.only(bottom: 20), // Exact margin for calculation
       height: 55, // Exact height for calculation
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-        ),
+        color: Colors.white.withOpacity(0.02),
+        borderRadius: BorderRadius.circular(12),
         border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.1)),
-          left: BorderSide(color: Colors.white.withOpacity(0.1)),
-          right: BorderSide(color: Colors.white.withOpacity(0.1)),
+          top: BorderSide(color: GoXeyColors.neonLime.withOpacity(0.4), width: 1.5),
+          bottom: BorderSide(color: Colors.black.withOpacity(0.8), width: 2),
+          left: BorderSide(color: Colors.white.withOpacity(0.05)),
+          right: BorderSide(color: Colors.white.withOpacity(0.05)),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: GoXeyColors.gxCyan.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.6),
+            blurRadius: 10,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Glass body gradient
+          // 3D Glass Surface Reflection
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
+                    Colors.white.withOpacity(0.15),
+                    Colors.white.withOpacity(0.0),
                     Colors.white.withOpacity(0.0),
                     Colors.white.withOpacity(0.05),
                   ],
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
+                  stops: const [0.0, 0.3, 0.7, 1.0],
                 ),
               ),
             ),
@@ -511,6 +565,11 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     ),
                   ),
                 ),
+                if (title.contains("DIMOO")) ...[
+                  Image.asset("assets/avatars/avatar_3.jpg", height: 35, width: 35, fit: BoxFit.contain),
+                  const SizedBox(width: 4),
+                  Image.asset("assets/avatars/avatar_5.jpg", height: 35, width: 35, fit: BoxFit.contain),
+                ],
               ],
             ),
           ),
@@ -590,52 +649,201 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
   }
 
   void _showShowcaseDialog(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ShowcasePage()),
+    );
+  }
+
+  void _showCreatePocketDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Milestone Reached 🎉", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text("Create Shared Pocket", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("You've contributed RM500 this week!", style: TextStyle(color: GoXeyColors.neonLime, fontSize: 16)),
-            const SizedBox(height: 20),
-            const Text("Collection Status", style: TextStyle(color: Colors.white70, fontSize: 14)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
-              child: const Row(
-                children: [
-                  Icon(Icons.inventory_2, color: Colors.white54),
-                  SizedBox(width: 12),
-                  Text("5/10 Crybaby characters", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ],
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Pocket Name (e.g. Bali Trip)",
+                hintStyle: const TextStyle(color: Colors.white24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Target Amount (RM)",
+                hintStyle: const TextStyle(color: Colors.white24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: () => _showFriendSelectionDialog(context),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_add, color: GoXeyColors.neonLime, size: 20),
+                    const SizedBox(width: 8),
+                    const Text("Select Friends/Family to Add", style: TextStyle(color: GoXeyColors.neonLime)),
+                  ],
+                ),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close", style: TextStyle(color: Colors.white38)),
-          ),
-          ElevatedButton.icon(
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Shared to IG Story! 📸"), backgroundColor: GoXeyColors.gxPurple),
+                const SnackBar(content: Text("Shared pocket created successfully! 🚀"), backgroundColor: GoXeyColors.neonLime),
               );
             },
-            icon: const Icon(Icons.share, size: 16),
-            label: const Text("Share to IG/Story"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: GoXeyColors.radicalRed,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            child: const Text("Create"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFriendSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Select Friends", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "Search bank account number of friend/family member",
+                  hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white24),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
+                    _buildFriendItem(context, "Chloe", "5647382910 (CIMB)"),
+                    _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
+                  );
+                },
+                icon: const Icon(Icons.share, size: 18, color: Colors.white),
+                label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.white24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Done", style: TextStyle(color: GoXeyColors.neonLime))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendItem(BuildContext context, String name, String details) {
+    return ListTile(
+      leading: CircleAvatar(backgroundColor: Colors.white10, child: const Icon(Icons.person, color: Colors.white54)),
+      title: Text(name, style: const TextStyle(color: Colors.white)),
+      subtitle: Text(details, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+      trailing: const Icon(Icons.add_circle_outline, color: GoXeyColors.neonLime),
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$name added!"), backgroundColor: GoXeyColors.gxPurple, duration: const Duration(seconds: 1)),
+        );
+      },
+    );
+  }
+
+  void _showAddFriendsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Add to Squad", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search bank account number of friend/family member",
+                hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                prefixIcon: const Icon(Icons.search, color: Colors.white24),
+              ),
+              style: const TextStyle(color: Colors.white),
             ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
+                );
+              },
+              icon: const Icon(Icons.share, size: 18, color: Colors.white),
+              label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.white24),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                minimumSize: const Size(double.infinity, 44),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Invite sent!"), backgroundColor: GoXeyColors.neonLime),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            child: const Text("Invite"),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../widgets/avatar_viewer.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
+import '../core/budget_provider.dart';
 import 'avatar_creator_page.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -85,6 +86,7 @@ class MePage extends StatelessWidget {
               ),
               _buildProfileOption(Icons.security, "Security & Privacy"),
               _buildProfileOption(Icons.card_giftcard, "Blind Box Collection"),
+              _buildProfileOption(Icons.account_balance, "Budget & Debt Settings", onTap: () => _showBudgetSettings(context)),
               const SizedBox(height: 40),
               TextButton(
                 onPressed: () {},
@@ -127,6 +129,82 @@ class MePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showBudgetSettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer<BudgetProvider>(
+          builder: (context, budgetProvider, child) {
+            double tempLimit = budgetProvider.monthlySpendingLimit;
+            double tempMinBank = budgetProvider.minimumMainBalance;
+            double tempPocketTransfer = 500.0;
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  title: const Text("Set Budget Rules", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text("Monthly Spending Limit: RM${tempLimit.toStringAsFixed(0)}", style: const TextStyle(color: Colors.white70)),
+                      Slider(
+                        value: tempLimit,
+                        min: 500,
+                        max: 10000,
+                        divisions: 95,
+                        activeColor: GoXeyColors.neonLime,
+                        onChanged: (val) => setState(() => tempLimit = val),
+                      ),
+                      const SizedBox(height: 12),
+                      Text("Minimum Bank Reserve: RM${tempMinBank.toStringAsFixed(0)}", style: const TextStyle(color: Colors.white70)),
+                      Text("Halts auto-transfer if balance falls below", style: const TextStyle(color: Colors.white38, fontSize: 10)),
+                      Slider(
+                        value: tempMinBank,
+                        min: 0,
+                        max: 2000,
+                        divisions: 20,
+                        activeColor: GoXeyColors.gxCyan,
+                        onChanged: (val) => setState(() => tempMinBank = val),
+                      ),
+                      const SizedBox(height: 12),
+                      Text("Max Transfer per Pocket: RM${tempPocketTransfer.toStringAsFixed(0)}", style: const TextStyle(color: Colors.white70)),
+                      Slider(
+                        value: tempPocketTransfer,
+                        min: 50,
+                        max: 2000,
+                        divisions: 39,
+                        activeColor: GoXeyColors.radicalRed,
+                        onChanged: (val) => setState(() => tempPocketTransfer = val),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+                    ElevatedButton(
+                      onPressed: () {
+                        budgetProvider.setSpendingLimit(tempLimit);
+                        budgetProvider.setMinimumMainBalance(tempMinBank);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Budget configuration updated!"), backgroundColor: GoXeyColors.neonLime),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.neonLime),
+                      child: const Text("Save Configuration", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
