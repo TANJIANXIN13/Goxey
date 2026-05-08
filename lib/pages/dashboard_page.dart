@@ -38,6 +38,75 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  void _showAddMoneyDialog() {
+    final TextEditingController amountController = TextEditingController();
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Add Money", style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "How much do you want to add to your main account?",
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              style: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                prefixText: "RM ",
+                prefixStyle: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final amount = double.tryParse(amountController.text) ?? 0;
+              if (amount > 0) {
+                appState.addMoneyToMainAccount(amount);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Successfully added RM ${amount.toStringAsFixed(2)}!"),
+                    backgroundColor: GoXeyColors.neonLime,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please enter a valid amount")),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GoXeyColors.neonLime,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showPocketMoneyDialog() {
     final TextEditingController amountController = TextEditingController();
     final appState = Provider.of<AppState>(context, listen: false);
@@ -350,7 +419,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildActionCircle(Icons.add, "Add money", isGoxey, () => _showFunctionalityToast("Add Money")),
+        _buildActionCircle(Icons.add, "Add money", isGoxey, _showAddMoneyDialog),
         _buildActionCircle(Icons.qr_code_scanner, "Scan QR", isGoxey, () => isGoxey ? _triggerQrPaymentFriction() : _showFunctionalityToast("Scan QR")),
         _buildActionCircle(Icons.send, "Send money", isGoxey, () => _showFunctionalityToast("Send Money")),
       ],

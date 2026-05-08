@@ -47,6 +47,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> addMoneyToMainAccount(double amount) async {
+    if (amount > 0) {
+      _totalBalance += amount;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('totalBalance', _totalBalance);
+      notifyListeners();
+    }
+  }
+
   Future<void> transferToPockets(double amount) async {
     if (amount <= _totalBalance) {
       _totalBalance -= amount;

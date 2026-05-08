@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lottie/lottie.dart';
@@ -6,6 +7,14 @@ import '../core/theme.dart';
 import '../core/app_state.dart';
 import '../widgets/avatar_viewer.dart';
 import 'avatar_creator_page.dart';
+
+class _CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
 
 class BlindBoxPage extends StatefulWidget {
   final String seriesName;
@@ -19,7 +28,22 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
   bool _isOpened = false;
   bool _isRevealed = false;
   bool _isHidden = false;
+  bool _isCustomizing = false;
   String _revealedAvatarUrl = "";
+  int _customIndex = 0;
+
+  final List<String> _dimooCustomPool = [
+    "assets/avatars/dimoo/custom/dimoo_hidden_1.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_2.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_3.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_4.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_5.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_6.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_7.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_8.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_9.jpg",
+    "assets/avatars/dimoo/custom/dimoo_hidden_10.jpg",
+  ];
 
   void _handleOpen() async {
     setState(() => _isOpened = true);
@@ -95,7 +119,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics: _isCustomizing ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
@@ -220,15 +244,70 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                           else
                             Column(
                               children: [
-                                SizedBox(
-                                  height: 400,
-                                  child: AvatarViewer(modelUrl: _revealedAvatarUrl),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  _isHidden ? "LEGENDARY PULL!" : "Sweet Catch!",
-                                  style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                                ),
+                                if (_isCustomizing)
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 400,
+                                        child: ScrollConfiguration(
+                                          behavior: _CustomScrollBehavior(),
+                                          child: PageView.builder(
+                                            controller: PageController(viewportFraction: 0.85, initialPage: 1000), 
+                                            physics: const AlwaysScrollableScrollPhysics(),
+                                            onPageChanged: (idx) => setState(() => _customIndex = idx % 10),
+                                            itemBuilder: (context, index) {
+                                              final realIdx = index % 10;
+                                              return AnimatedScale(
+                                                scale: _customIndex == realIdx ? 1.0 : 0.8,
+                                                duration: const Duration(milliseconds: 300),
+                                                child: AvatarViewer(
+                                                  modelUrl: _dimooCustomPool[realIdx],
+                                                  showBackground: false,
+                                                  height: 400,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: List.generate(10, (index) => Container(
+                                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                                          width: 6,
+                                          height: 6,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: _customIndex == index ? GoXeyColors.neonLime : Colors.white24,
+                                          ),
+                                        )),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      const Text(
+                                        "Swipe to Change Color",
+                                        style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 14),
+                                      ),
+                                    ],
+                                  )
+                                else
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 400,
+                                        child: AvatarViewer(
+                                          modelUrl: _revealedAvatarUrl,
+                                          showBackground: false,
+                                          height: 400,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        _isHidden ? "LEGENDARY PULL!" : "Sweet Catch!",
+                                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                         ],
@@ -236,7 +315,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                     ),
                   ],
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -253,33 +332,62 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                             child: const Text("TAP TO UNBOX", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
                           )
                         else
-                          Row(
+                          Column(
                             children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.white24),
-                                    minimumSize: const Size(0, 64),
+                              if (_isHidden && widget.seriesName == "Dimoo" && !_isCustomizing) ...[
+                                ElevatedButton(
+                                  onPressed: () => setState(() => _isCustomizing = true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white10,
+                                    side: const BorderSide(color: GoXeyColors.neonLime),
+                                    minimumSize: const Size(double.infinity, 56),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                   ),
-                                  child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
-                                ),
-                              ),
-                              if (appState.availableBoxes > 0) ...[
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () => setState(() { _isOpened = false; _isRevealed = false; _isHidden = false; }),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: GoXeyColors.neonLime,
-                                      minimumSize: const Size(0, 64),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                    ),
-                                    child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.palette_outlined, color: GoXeyColors.neonLime),
+                                      SizedBox(width: 12),
+                                      Text("CUSTOMIZE STYLE", style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold)),
+                                    ],
                                   ),
                                 ),
+                                const SizedBox(height: 16),
                               ],
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.white24),
+                                        minimumSize: const Size(0, 64),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                      ),
+                                      child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
+                                    ),
+                                  ),
+                                  if (appState.availableBoxes > 0) ...[
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () => setState(() { 
+                                          _isOpened = false; 
+                                          _isRevealed = false; 
+                                          _isHidden = false; 
+                                          _isCustomizing = false;
+                                        }),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: GoXeyColors.neonLime,
+                                          minimumSize: const Size(0, 64),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        ),
+                                        child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ],
                           ),
                       ],

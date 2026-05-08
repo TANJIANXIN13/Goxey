@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/avatars/
     - assets/avatars/dimoo/
+    - assets/avatars/dimoo/custom/
     - assets/avatars/goxey/
     - assets/series/
 
