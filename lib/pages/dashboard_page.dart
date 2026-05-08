@@ -276,7 +276,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
           const Spacer(),
-          const ModeToggle(),
+          if (_currentIndex == 0) const ModeToggle(),
           const SizedBox(width: 12),
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.white, size: 24),
