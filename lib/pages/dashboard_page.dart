@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
@@ -469,20 +470,59 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   int _selectedSeriesIndex = 0;
+  late int _currentSeriesPage;
+  static const int _infiniteSeriesCount = 10000;
+
   final List<Map<String, dynamic>> _seriesOptions = [
     {
       "name": "GoXey Original",
       "tag": "IP SERIES 1",
       "color": GoXeyColors.neonLime,
-      "image": "assets/avatars/avatar_1.jpg", // Representing the series
+      "poster": "assets/avatars/avatar_1.jpg",
     },
     {
-      "name": "Popmart Collab",
-      "tag": "LIMITED EDITION",
-      "color": GoXeyColors.radicalRed,
-      "image": "assets/avatars/avatar_6.jpg", // Different style for collab
+      "name": "Hirono",
+      "tag": "MONSTERS' CARNIVAL",
+      "color": const Color(0xFF8B4513),
+      "poster": "assets/series/hirono.jpg",
+    },
+    {
+      "name": "Molly",
+      "tag": "SCENERY ALONG THE WAY",
+      "color": const Color(0xFF00BFFF),
+      "poster": "assets/series/molly.jpg",
+    },
+    {
+      "name": "Skullpanda",
+      "tag": "THE FEAST BEGINS",
+      "color": const Color(0xFFE6E6FA),
+      "poster": "assets/series/skullpanda.jpg",
+    },
+    {
+      "name": "Crybaby",
+      "tag": "CRYING TO THE MOON",
+      "color": const Color(0xFFFF69B4),
+      "poster": "assets/series/crybaby.jpg",
+    },
+    {
+      "name": "Twinkle Twinkle",
+      "tag": "SAVOR THE MOMENT",
+      "color": const Color(0xFFFFA500),
+      "poster": "assets/series/twinkle.jpg",
+    },
+    {
+      "name": "Dimoo",
+      "tag": "THE MISSING DAY",
+      "color": const Color(0xFF9ACD32),
+      "poster": "assets/series/dimoo.jpg",
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSeriesPage = _infiniteSeriesCount ~/ 2;
+  }
 
   Widget _buildAvatarBlindBoxSection() {
     return Padding(
@@ -498,63 +538,96 @@ class _DashboardPageState extends State<DashboardPage> {
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                "SWIPE TO BROWSE",
+                "SWIPE SERIES",
                 style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          // Series Carousel
-          SizedBox(
-            height: 380,
+          // Series Carousel (Infinite Loop)
+        SizedBox(
+          height: 420,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
             child: PageView.builder(
-              itemCount: _seriesOptions.length,
-              onPageChanged: (index) => setState(() => _selectedSeriesIndex = index),
+              controller: PageController(
+                viewportFraction: 0.85,
+                initialPage: _currentSeriesPage,
+              ),
+              itemCount: _infiniteSeriesCount,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentSeriesPage = index;
+                  _selectedSeriesIndex = index % _seriesOptions.length;
+                });
+              },
               itemBuilder: (context, index) {
-                final series = _seriesOptions[index];
-                return AnimatedOpacity(
+                final actualIndex = index % _seriesOptions.length;
+                final series = _seriesOptions[actualIndex];
+                bool isSelected = _selectedSeriesIndex == actualIndex;
+                bool hasPoster = series.containsKey('poster') && series['name'] != "GoXey Original";
+                
+                return AnimatedScale(
+                  scale: isSelected ? 1.0 : 0.9,
                   duration: const Duration(milliseconds: 300),
-                  opacity: _selectedSeriesIndex == index ? 1.0 : 0.5,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: isSelected ? Colors.white.withOpacity(0.05) : Colors.black12,
                       borderRadius: BorderRadius.circular(32),
                       border: Border.all(
-                        color: _selectedSeriesIndex == index 
-                          ? series['color'].withOpacity(0.5) 
-                          : Colors.white10,
+                        color: isSelected ? series['color'].withOpacity(0.5) : Colors.white10,
                         width: 2,
                       ),
+                      image: hasPoster ? DecorationImage(
+                        image: AssetImage(series['poster']),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(isSelected ? 0.4 : 0.7),
+                          BlendMode.darken,
+                        ),
+                      ) : null,
+                      boxShadow: isSelected ? [
+                        BoxShadow(color: series['color'].withOpacity(0.2), blurRadius: 20, spreadRadius: 5)
+                      ] : [],
                     ),
-                    child: Column(
+                    child: Stack(
                       children: [
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: series['color'].withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            series['tag'],
-                            style: TextStyle(color: series['color'], fontSize: 10, fontWeight: FontWeight.bold),
+                        Positioned.fill(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 24),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: series['color'].withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  series['tag'],
+                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                series['name'].toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 2),
+                              ),
+                              const Spacer(),
+                              Hero(
+                                tag: 'box_${series['name']}',
+                                child: Icon(Icons.inventory_2, size: 120, color: series['color']),
+                              ),
+                              const SizedBox(height: 40),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          series['name'],
-                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
-                        ),
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Hero(
-                            tag: 'box_${series['name']}',
-                            child: Icon(Icons.inventory_2, size: 150, color: series['color']),
-                          ),
-                        ),
-                        const Spacer(),
                       ],
                     ),
                   ),
@@ -562,6 +635,7 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
           ),
+        ),
           const SizedBox(height: 24),
           Consumer<AppState>(
             builder: (context, appState, child) {

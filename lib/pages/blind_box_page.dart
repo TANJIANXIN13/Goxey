@@ -32,12 +32,18 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
       // Hidden Logic (e.g., 20% chance for demo, usually 1/144 in Popmart!)
       _isHidden = (DateTime.now().millisecond % 5 == 0);
 
-      List<String> pool = [];
-      if (widget.seriesName == "GoXey Original") {
-        pool = ["assets/avatars/avatar_1.jpg", "assets/avatars/avatar_2.jpg", "assets/avatars/avatar_3.jpg", "assets/avatars/avatar_4.jpg", "assets/avatars/avatar_5.jpg"];
-      } else {
-        pool = ["assets/avatars/avatar_6.jpg", "assets/avatars/avatar_7.jpg", "assets/avatars/avatar_8.jpg", "assets/avatars/avatar_9.jpg", "assets/avatars/avatar_10.jpg"];
-      }
+      // Distribute our 10 avatars across the series
+      Map<String, List<String>> pools = {
+        "GoXey Original": ["assets/avatars/avatar_1.jpg", "assets/avatars/avatar_2.jpg"],
+        "Hirono": ["assets/avatars/avatar_3.jpg", "assets/avatars/avatar_4.jpg"],
+        "Molly": ["assets/avatars/avatar_5.jpg", "assets/avatars/avatar_6.jpg"],
+        "Skullpanda": ["assets/avatars/avatar_7.jpg", "assets/avatars/avatar_8.jpg"],
+        "Crybaby": ["assets/avatars/avatar_9.jpg"],
+        "Twinkle Twinkle": ["assets/avatars/avatar_10.jpg"],
+        "Dimoo": ["assets/avatars/avatar_1.jpg", "assets/avatars/avatar_3.jpg", "assets/avatars/avatar_5.jpg"],
+      };
+
+      List<String> pool = pools[widget.seriesName] ?? pools["GoXey Original"]!;
 
       _revealedAvatarUrl = (pool..shuffle()).first;
       
