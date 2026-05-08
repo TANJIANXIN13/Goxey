@@ -521,7 +521,9 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _currentSeriesPage = _infiniteSeriesCount ~/ 2;
+    // Ensure initial page results in index 0 (GoXey Original)
+    // 5005 is a multiple of 7 (our series count)
+    _currentSeriesPage = 5005; 
   }
 
   Widget _buildAvatarBlindBoxSection() {

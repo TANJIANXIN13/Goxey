@@ -64,20 +64,8 @@ class AppState extends ChangeNotifier {
     if (availableBoxes > 0) {
       _usedBoxesCount++;
       
-      // Randomly pick a new GoXey IP avatar
-      final avatarTemplates = [
-        "assets/avatars/avatar_1.jpg",
-        "assets/avatars/avatar_2.jpg",
-        "assets/avatars/avatar_3.jpg",
-        "assets/avatars/avatar_4.jpg",
-        "assets/avatars/avatar_5.jpg",
-      ];
-      
-      _avatarUrl = (avatarTemplates..shuffle()).first;
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('usedBoxesCount', _usedBoxesCount);
-      await prefs.setString('avatarUrl', _avatarUrl);
       
       notifyListeners();
     }

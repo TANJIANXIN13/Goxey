@@ -301,6 +301,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     color: (tx["color"] as Color).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
+                  child: Icon(tx["icon"] as IconData, color: tx["color"] as Color, size: 20),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

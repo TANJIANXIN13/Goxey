@@ -29,28 +29,9 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
     if (mounted) {
       final appState = Provider.of<AppState>(context, listen: false);
       
-      // Hidden Logic (e.g., 20% chance for demo, usually 1/144 in Popmart!)
-      _isHidden = (DateTime.now().millisecond % 5 == 0);
-
-      // Distribute our 10 avatars across the series
-      Map<String, List<String>> pools = {
-        "GoXey Original": ["assets/avatars/avatar_1.jpg", "assets/avatars/avatar_2.jpg"],
-        "Hirono": ["assets/avatars/avatar_3.jpg", "assets/avatars/avatar_4.jpg"],
-        "Molly": ["assets/avatars/avatar_5.jpg", "assets/avatars/avatar_6.jpg"],
-        "Skullpanda": ["assets/avatars/avatar_7.jpg", "assets/avatars/avatar_8.jpg"],
-        "Crybaby": ["assets/avatars/avatar_9.jpg"],
-        "Twinkle Twinkle": ["assets/avatars/avatar_10.jpg"],
-        "Dimoo": ["assets/avatars/avatar_1.jpg", "assets/avatars/avatar_3.jpg", "assets/avatars/avatar_5.jpg"],
-      };
-
-      List<String> pool = pools[widget.seriesName] ?? pools["GoXey Original"]!;
-
-      _revealedAvatarUrl = (pool..shuffle()).first;
-      
-      // If it's normal, we save immediately. If hidden, we wait for customization.
-      if (!_isHidden) {
-        await appState.updateAvatarUrl(_revealedAvatarUrl);
-      }
+      // Blind Box rewards are not ready yet, so we show a placeholder for the demo
+      _isHidden = false; 
+      _revealedAvatarUrl = ""; // No avatar revealed yet
       
       await appState.openBlindBox(); 
 
@@ -120,9 +101,20 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                         )
                       else
                         Lottie.network(
-                          'https://assets9.lottiefiles.com/packages/lf20_touunsqy.json',
+                          'https://lottie.host/6168532c-3543-4414-8789-940733835697/xYmR7H5S0I.json', // More stable confetti/opening
                           repeat: false,
                           height: 300,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox(
+                              height: 300,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: GoXeyColors.neonLime,
+                                  strokeWidth: 4,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       const SizedBox(height: 40),
                       Text(
@@ -160,11 +152,34 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                       const SizedBox(height: 30),
                       SizedBox(
                         height: 400,
-                        child: AvatarViewer(modelUrl: _revealedAvatarUrl),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.auto_awesome, size: 80, color: GoXeyColors.neonLime.withOpacity(0.5)),
+                              const SizedBox(height: 24),
+                              const Text(
+                                "REWARD UNDER\nDEVELOPMENT",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: GoXeyColors.neonLime,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "Stay tuned for the official launch!",
+                                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        _isHidden ? "LEGENDARY PULL!" : "Sweet Catch!",
+                        "TEASER UNLOCKED!",
                         style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -191,28 +206,6 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                     else
                       Column(
                         children: [
-                          if (_isHidden) ...[
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const AvatarCreatorPage()),
-                                );
-                                if (result != null && mounted) {
-                                  await appState.updateAvatarUrl(result as String);
-                                  Navigator.pop(context);
-                                }
-                              },
-                              icon: const Icon(Icons.face_retouching_natural, color: Colors.black),
-                              label: const Text("CUSTOMIZE FACE SCAN", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFD700),
-                                minimumSize: const Size(double.infinity, 64),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
                           Row(
                             children: [
                               Expanded(
