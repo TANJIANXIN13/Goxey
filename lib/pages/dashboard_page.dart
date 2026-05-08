@@ -171,7 +171,7 @@ class _DashboardPageState extends State<DashboardPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: isGoxey
-                ? [const Color(0xFFFF3366), const Color(0xFF9933FF)] // Premium Pink to Purple
+                ? [const Color(0xFF212427), const Color(0xFF212427)] // Solid #212427
                 : [GoXeyColors.gxBgTop, GoXeyColors.gxBgBottom], // GXBank Classic
           ),
         ),
@@ -262,11 +262,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Text(
                     "USER",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      letterSpacing: isGoxey ? 1.0 : 0.0,
+                      letterSpacing: 1.0,
                     ),
                   ),
                   const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
@@ -362,7 +362,7 @@ class _DashboardPageState extends State<DashboardPage> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: isGoxey ? Colors.white.withOpacity(0.2) : GoXeyColors.gxPurple,
+            color: isGoxey ? const Color(0xFFEE2677) : GoXeyColors.gxPurple,
             shape: BoxShape.circle,
             boxShadow: [
               if (isGoxey)
@@ -425,7 +425,12 @@ class _DashboardPageState extends State<DashboardPage> {
       padding: const EdgeInsets.all(16),
       height: 180,
       decoration: BoxDecoration(
-        color: isGoxey ? Colors.white.withOpacity(0.1) : GoXeyColors.gxDarkCard,
+        color: isGoxey ? null : GoXeyColors.gxDarkCard,
+        gradient: isGoxey ? const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF9D00F2), Color(0xFFEE2677)],
+        ) : null,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white10),
       ),
@@ -554,19 +559,19 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isHighlight ? GoXeyColors.neonLime.withOpacity(0.2) : Colors.white.withOpacity(0.1),
+          color: isHighlight ? GoXeyColors.neonLime.withOpacity(0.2) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isHighlight ? GoXeyColors.neonLime : Colors.white10),
         ),
         child: Row(
           children: [
-            Icon(icon, color: isHighlight ? GoXeyColors.neonLime : Colors.white, size: 20),
+            Icon(icon, color: isHighlight ? GoXeyColors.neonLime : Colors.black, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 label, 
                 style: TextStyle(
-                  color: isHighlight ? GoXeyColors.neonLime : Colors.white, 
+                  color: isHighlight ? GoXeyColors.neonLime : Colors.black, 
                   fontSize: 12, 
                   fontWeight: FontWeight.bold
                 ),

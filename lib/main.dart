@@ -15,7 +15,6 @@ void main() {
 
 class GoXeyApp extends StatelessWidget {
   const GoXeyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Consumer<AppState>(

@@ -40,12 +40,14 @@ class RoastCard extends StatelessWidget {
                     size: 20,
                   ),
                 ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     "ROAST MODE AI",
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: GoXeyColors.radicalRed,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                           letterSpacing: 1.2,
                         ),
                     overflow: TextOverflow.ellipsis,

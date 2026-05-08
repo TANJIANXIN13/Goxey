@@ -54,7 +54,12 @@ class ModeToggle extends StatelessWidget {
                 height: 28,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: isGoxey ? GoXeyColors.accentPurple : Colors.white,
+                  color: isGoxey ? null : Colors.white,
+                  gradient: isGoxey
+                      ? const LinearGradient(
+                          colors: [GoXeyColors.accentPurple, Color(0xFFEE2677)],
+                        )
+                      : null,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),

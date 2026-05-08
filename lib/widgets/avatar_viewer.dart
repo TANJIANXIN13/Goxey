@@ -5,8 +5,15 @@ import '../core/app_state.dart';
 
 class AvatarViewer extends StatelessWidget {
   final String? modelUrl;
+  final double height;
+  final double? width;
   
-  const AvatarViewer({super.key, this.modelUrl});
+  const AvatarViewer({
+    super.key, 
+    this.modelUrl,
+    this.height = 220,
+    this.width,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +25,8 @@ class AvatarViewer extends StatelessWidget {
     bool isGlb = url.endsWith('.glb');
 
     return Container(
-      width: double.infinity,
-      height: 350,
+      width: width ?? double.infinity,
+      height: height,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(32),

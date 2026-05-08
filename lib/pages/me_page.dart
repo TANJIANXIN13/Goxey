@@ -19,7 +19,11 @@ class MePage extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
               FadeInDown(
-                child: AvatarViewer(modelUrl: appState.avatarUrl),
+                child: AvatarViewer(
+                  modelUrl: appState.avatarUrl,
+                  height: 210,
+                  width: 152,
+                ),
               ),
               const SizedBox(height: 16),
               FadeInUp(
