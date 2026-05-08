@@ -13,10 +13,13 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  bool _hasShownPopup = false;
+
   @override
   void didUpdateWidget(covariant HistoryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isActive && !oldWidget.isActive) {
+    if (widget.isActive && !oldWidget.isActive && !_hasShownPopup) {
+      _hasShownPopup = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showSpendSummaryDialog(context);
       });
