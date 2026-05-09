@@ -35,7 +35,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
         "SKULLPANDA": ["skullpanda2.webp", "skullpanda5.webp"],
         "TWINKLE TWINKLE": ["twinkle twinkle 1.webp", "twinkle twinkle 4.webp"],
         "MOLLY": ["molly1.webp", "molly5.webp"],
-        "GX SERIES": ["gx1.png", "gx2.jpg"],
+        "GX SERIES": ["gx1.png", "gx2.png"],
       },
     },
     {
@@ -51,7 +51,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
         "SKULLPANDA": ["skullpanda1.webp"],
         "TWINKLE TWINKLE": ["twinkle twinkle 2.webp", "twinkle twinkle 6.webp"],
         "MOLLY": ["molly2.webp"],
-        "GX SERIES": ["gx3.jpg"],
+        "GX SERIES": ["gx3.png"],
       },
     },
     {
@@ -83,7 +83,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
         "SKULLPANDA": ["skullpanda3.webp"],
         "TWINKLE TWINKLE": ["twinkle twinkle 7.webp"],
         "MOLLY": ["molly1.webp"],
-        "GX SERIES": ["gx5.jpg"],
+        "GX SERIES": ["gx5.png"],
       },
     },
   ];

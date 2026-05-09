@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
@@ -226,6 +227,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _triggerQrPaymentFriction() {
+    final double randomAmount = 5.0 + (math.Random().nextDouble() * 995.0);
+    final amountString = randomAmount.toStringAsFixed(2);
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -262,22 +266,22 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 32),
             FrictionButton(
               isWant: true,
-              label: "CONFIRM RM 400.00",
+              label: "CONFIRM RM $amountString",
               onSuccess: () {
                 final appState = Provider.of<AppState>(context, listen: false);
                 appState.addTransaction(
                   name: "QR Payment",
                   category: "Spend",
-                  amount: -400.00,
+                  amount: -randomAmount,
                   icon: Icons.qr_code_scanner,
                   color: GoXeyColors.radicalRed,
                 );
                 Navigator.pop(context);
                 SpendVisualizer.show(
                   context,
-                  amount: 400,
+                  amount: randomAmount,
                   item: "Maggi",
-                  count: 200,
+                  count: (randomAmount / 2).floor(), // Assuming RM 2 per Maggi
                 );
               },
             ),

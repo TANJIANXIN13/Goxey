@@ -54,9 +54,9 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
       _progress = 0.0;
     });
 
-    _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
       setState(() {
-        _progress += 0.01; // Approx 5 seconds total (50ms * 100 = 5s)
+        _progress += 0.005; // 4 seconds target to compensate for web lag
         if (_progress >= 1.0) {
           _timer?.cancel();
           _isPressing = false;

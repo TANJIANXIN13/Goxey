@@ -203,15 +203,15 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                 height: 400,
                                 child: Center(
                                   child: _isOpened 
-                                    ? Lottie.network(
-                                        'https://assets10.lottiefiles.com/packages/lf20_6wutsrox.json',
-                                        height: 300,
-                                        frameBuilder: (context, child, composition) {
-                                          if (composition == null) {
-                                            return const Center(child: CircularProgressIndicator(color: GoXeyColors.neonLime));
-                                          }
-                                          return child;
-                                        },
+                                    ? Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          const CircularProgressIndicator(color: GoXeyColors.neonLime),
+                                          Lottie.network(
+                                            'https://assets10.lottiefiles.com/packages/lf20_6wutsrox.json',
+                                            height: 300,
+                                          ),
+                                        ],
                                       )
                                     : Image.asset(
                                         widget.seriesName == "GX Series" 
