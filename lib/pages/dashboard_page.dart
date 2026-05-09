@@ -108,22 +108,23 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  void _showPocketMoneyDialog() {
+  void _showPocketMoneyDialog(Pocket pocket) {
     final TextEditingController amountController = TextEditingController();
     final appState = Provider.of<AppState>(context, listen: false);
+    final pocketProvider = Provider.of<PocketProvider>(context, listen: false);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Add Pocket Money", style: TextStyle(color: Colors.white)),
+        title: Text("Add to ${pocket.name}", style: const TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "How much do you want to save today?",
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+            Text(
+              "Transfer from Main Account to ${pocket.name}",
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 20),
             TextField(
@@ -151,10 +152,11 @@ class _DashboardPageState extends State<DashboardPage> {
               final amount = double.tryParse(amountController.text) ?? 0;
               if (amount > 0 && amount <= appState.totalBalance) {
                 appState.transferToPockets(amount);
+                pocketProvider.addMoneyToPocket(pocket, amount);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Transferred RM ${amount.toStringAsFixed(2)} to Pockets!"),
+                    content: Text("Transferred RM ${amount.toStringAsFixed(2)} to ${pocket.name}!"),
                     backgroundColor: GoXeyColors.neonLime,
                     duration: const Duration(seconds: 2),
                   ),
@@ -464,13 +466,14 @@ class _DashboardPageState extends State<DashboardPage> {
         final pockets = pocketProvider.pockets;
         // Build all cards: Main Account + one per pocket
         final cards = <Widget>[
-          _buildAccountCard("Main Account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey, members: []),
+          _buildAccountCard("Main Account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey, members: [], onTap: _showAddMoneyDialog),
           ...pockets.map((p) => _buildAccountCard(
             p.name,
             "RM${p.saved.toStringAsFixed(2)} / RM${p.target.toStringAsFixed(2)}",
             "${(p.saved / p.target * 100).clamp(0, 100).toStringAsFixed(0)}% saved",
             isGoxey,
             members: p.members,
+            onTap: () => _showPocketMoneyDialog(p),
           )),
         ];
 
@@ -512,66 +515,69 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildAccountCard(String title, String balance, String? promo, bool isGoxey, {List<String> members = const []}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      height: 200,
-      decoration: BoxDecoration(
-        color: isGoxey ? null : GoXeyColors.gxDarkCard,
-        gradient: isGoxey ? const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF9D00F2), Color(0xFFEE2677)],
-        ) : null,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          const SizedBox(height: 8),
-          Text(
-            balance,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          if (promo != null) ...[
+  Widget _buildAccountCard(String title, String balance, String? promo, bool isGoxey, {List<String> members = const [], VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        height: 200,
+        decoration: BoxDecoration(
+          color: isGoxey ? null : GoXeyColors.gxDarkCard,
+          gradient: isGoxey ? const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF9D00F2), Color(0xFFEE2677)],
+          ) : null,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: GoXeyColors.gxCyan.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                promo,
-                style: const TextStyle(color: GoXeyColors.gxCyan, fontSize: 10, fontWeight: FontWeight.bold),
-              ),
+            Text(
+              balance,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ],
-          if (members.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(Icons.people_outline, color: Colors.white38, size: 13),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    "Me, ${members.join(', ')}",
-                    style: const TextStyle(color: Colors.white38, fontSize: 11),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            if (promo != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: GoXeyColors.gxCyan.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-              ],
-            ),
+                child: Text(
+                  promo,
+                  style: const TextStyle(color: GoXeyColors.gxCyan, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+            if (members.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.people_outline, color: Colors.white38, size: 13),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      "Me, ${members.join(', ')}",
+                      style: const TextStyle(color: Colors.white38, fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const Spacer(),
+            if (title == "Main Account")
+              const Text(
+                "View transactions",
+                style: TextStyle(color: Colors.white54, fontSize: 10),
+              ),
           ],
-          const Spacer(),
-          if (title == "Main Account")
-            const Text(
-              "View transactions",
-              style: TextStyle(color: Colors.white54, fontSize: 10),
-            ),
-        ],
+        ),
       ),
     );
   }

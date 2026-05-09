@@ -30,4 +30,12 @@ class PocketProvider extends ChangeNotifier {
     _pockets.add(Pocket(name: name, target: target, members: members));
     notifyListeners();
   }
+
+  void addMoneyToPocket(Pocket pocket, double amount) {
+    final index = _pockets.indexOf(pocket);
+    if (index != -1) {
+      _pockets[index].saved += amount;
+      notifyListeners();
+    }
+  }
 }
