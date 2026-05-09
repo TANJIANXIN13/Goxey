@@ -91,8 +91,13 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
       setState(() {
         _isProcessing = false;
         _showSelection = true;
-        _selectedAvatarIndex = 0; // Default to AvatarYX.jpg
-        _currentPage = (_infiniteCount ~/ 2); // Center on the default avatar
+        
+        // Forced to index 0 (AvatarYX.jpg)
+        _selectedAvatarIndex = 0; 
+        // Jump to the nearest multiple of length to show index 0
+        int jumpTo = (1000 ~/ _avatarOptions.length) * _avatarOptions.length;
+        if (jumpTo < 500) jumpTo += _avatarOptions.length * 50; 
+        _currentPage = jumpTo;
         
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_pageController.hasClients) {

@@ -436,9 +436,11 @@ class _DashboardPageState extends State<DashboardPage> {
                         child: CircleAvatar(
                           radius: 18,
                           backgroundColor: Colors.white10,
-                          backgroundImage: appState.avatarUrl.startsWith('http')
-                              ? NetworkImage(appState.avatarUrl)
-                              : AssetImage(appState.avatarUrl) as ImageProvider,
+                          backgroundImage: (!appState.hasCreatedAvatar)
+                              ? const AssetImage("assets/avatars/goxey_placeholder.png")
+                              : (appState.avatarUrl.startsWith('http')
+                                  ? NetworkImage(appState.avatarUrl)
+                                  : AssetImage(appState.avatarUrl) as ImageProvider),
                         ),
                       ),
                     ),
