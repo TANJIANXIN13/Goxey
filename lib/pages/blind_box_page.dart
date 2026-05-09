@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
@@ -113,12 +115,130 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
 
   void _handleConfirmCustom() {
     final pool = (widget.seriesName == "Dimoo" ? _dimooCustomPool : _gxCustomPool);
-    final finalAvatar = pool[_customIndex];
-    Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
-      widget.seriesName, 
-      finalAvatar
+    setState(() {
+      _revealedAvatarUrl = pool[_customIndex];
+      _isCustomizing = false;
+    });
+    // We don't pop immediately, allow sharing or saving
+  }
+
+  void _showShareSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A20),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              "SHARE YOUR CATCH",
+              style: TextStyle(
+                color: GoXeyColors.neonLime,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 32),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildShareOption(
+                    "IG Story",
+                    LucideIcons.camera,
+                    const Color(0xFFE1306C),
+                  ),
+                  const SizedBox(width: 20),
+                  _buildShareOption(
+                    "WhatsApp",
+                    LucideIcons.message_circle,
+                    const Color(0xFF25D366),
+                  ),
+                  const SizedBox(width: 20),
+                  _buildShareOption(
+                    "Telegram",
+                    LucideIcons.send,
+                    const Color(0xFF0088CC),
+                  ),
+                  const SizedBox(width: 20),
+                  _buildShareOption(
+                    "Copy Link",
+                    LucideIcons.link,
+                    Colors.white54,
+                    onTap: () {
+                      Clipboard.setData(const ClipboardData(text: "https://goxey.app/share/rare_catch_123"));
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Link copied to clipboard!"),
+                          backgroundColor: GoXeyColors.neonLime,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Maybe later", style: TextStyle(color: Colors.white38)),
+            ),
+          ],
+        ),
+      ),
     );
-    Navigator.pop(context);
+  }
+
+  Widget _buildShareOption(String label, IconData icon, Color color, {VoidCallback? onTap}) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap ?? () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Sharing to $label..."),
+                backgroundColor: color,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withOpacity(0.5), width: 2),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
   }
 
   @override
@@ -344,55 +464,77 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                         child: const Text("CONFIRM SELECTION", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                                       )
                                     else
-                                      Row(
+                                      Column(
                                         children: [
-                                          Expanded(
-                                            child: OutlinedButton(
-                                              onPressed: () {
-                                                if (_isHidden) {
-                                                  Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
-                                                    widget.seriesName, 
-                                                    _revealedAvatarUrl
-                                                  );
-                                                }
-                                                Navigator.pop(context);
-                                              },
-                                              style: OutlinedButton.styleFrom(
-                                                side: const BorderSide(color: Colors.white24),
-                                                minimumSize: const Size(0, 64),
+                                          if (_isHidden) ...[
+                                            ElevatedButton(
+                                              onPressed: _showShareSheet,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.white,
+                                                foregroundColor: Colors.black,
+                                                minimumSize: const Size(double.infinity, 56),
                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                               ),
-                                              child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
+                                              child: const Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.share_outlined),
+                                                  SizedBox(width: 12),
+                                                  Text("SHARE YOUR CATCH", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          if (appState.availableBoxes > 0) ...[
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  if (_isHidden) {
+                                            const SizedBox(height: 16),
+                                          ],
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: OutlinedButton(
+                                                  onPressed: () {
                                                     Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
                                                       widget.seriesName, 
                                                       _revealedAvatarUrl
                                                     );
-                                                  }
-                                                  setState(() { 
-                                                    _isOpened = false; 
-                                                    _isRevealed = false; 
-                                                    _isHidden = false; 
-                                                    _isCustomizing = false;
-                                                    _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png";
-                                                  });
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: GoXeyColors.neonLime,
-                                                  minimumSize: const Size(0, 64),
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    side: const BorderSide(color: Colors.white24),
+                                                    minimumSize: const Size(0, 64),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                  ),
+                                                  child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
                                                 ),
-                                                child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                                               ),
-                                            ),
-                                          ],
+                                              if (appState.availableBoxes > 0) ...[
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      if (_isHidden) {
+                                                        Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+                                                          widget.seriesName, 
+                                                          _revealedAvatarUrl
+                                                        );
+                                                      }
+                                                      setState(() { 
+                                                        _isOpened = false; 
+                                                        _isRevealed = false; 
+                                                        _isHidden = false; 
+                                                        _isCustomizing = false;
+                                                        _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png";
+                                                      });
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: GoXeyColors.neonLime,
+                                                      minimumSize: const Size(0, 64),
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                    ),
+                                                    child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
                                         ],
                                       ),
                                   ],
