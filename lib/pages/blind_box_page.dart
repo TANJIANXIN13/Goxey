@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:lottie/lottie.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
+import '../core/pocket_provider.dart';
 import '../widgets/avatar_viewer.dart';
 import 'avatar_creator_page.dart';
 
@@ -18,7 +19,8 @@ class _CustomScrollBehavior extends MaterialScrollBehavior {
 
 class BlindBoxPage extends StatefulWidget {
   final String seriesName;
-  const BlindBoxPage({super.key, this.seriesName = "GoXey Original"});
+  final String? pocketName;
+  const BlindBoxPage({super.key, this.seriesName = "GX Series", this.pocketName});
 
   @override
   State<BlindBoxPage> createState() => _BlindBoxPageState();
@@ -29,7 +31,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
   bool _isRevealed = false;
   bool _isHidden = false;
   bool _isCustomizing = false;
-  String _revealedAvatarUrl = "";
+  String _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png"; // Default placeholder
   int _customIndex = 0;
 
   final List<String> _dimooCustomPool = [
@@ -45,58 +47,75 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
     "assets/avatars/dimoo/custom/dimoo_hidden_10.jpg",
   ];
 
+  final List<String> _gxCustomPool = [
+    "assets/avatars/goxey/custom/gx_hidden1.jpg",
+    "assets/avatars/goxey/custom/gx_hidden2.jpg",
+    "assets/avatars/goxey/custom/gx_hidden3.jpg",
+    "assets/avatars/goxey/custom/gx_hidden4.jpg",
+  ];
+
   void _handleOpen() async {
     setState(() => _isOpened = true);
-
     await Future.delayed(const Duration(seconds: 2));
-
     if (mounted) {
       final appState = Provider.of<AppState>(context, listen: false);
       
-      // Hidden Logic: 10% chance for demo (1/10)
-      _isHidden = (DateTime.now().millisecond % 10 == 0);
-
-      // Distribute rewards for active demo series
-      if (widget.seriesName == "Dimoo" || widget.seriesName == "GoXey Original") {
-        if (_isHidden) {
-          // Rare pulls for both series
-          if (widget.seriesName == "Dimoo") {
-            _revealedAvatarUrl = "assets/avatars/dimoo/dimoo_hidden.png";
-          } else {
-            _revealedAvatarUrl = "assets/series/gx_hidden.png";
-          }
-        } else {
-          Map<String, List<String>> pools = {
-            "Dimoo": [
-              "assets/avatars/dimoo/dimoo_new_1.png", 
-              "assets/avatars/dimoo/dimoo_new_2.png", 
-              "assets/avatars/dimoo/dimoo_new_3.png", 
-              "assets/avatars/dimoo/dimoo_new_4.png", 
-            ],
-            "GoXey Original": [
-              "assets/series/gx_bot.png",
-              "assets/series/gx_kid.png",
-              "assets/series/gx_devil.png",
-              "assets/series/gx_hoodie.png",
-            ],
-          };
-          List<String> pool = pools[widget.seriesName] ?? pools["Dimoo"]!;
-          _revealedAvatarUrl = (pool..shuffle()).first;
-        }
-      } else {
-        _revealedAvatarUrl = ""; // Others are coming soon
-      }
+      // Increased odds of hidden for testing as requested earlier
+      _isHidden = (DateTime.now().millisecond % 2 == 0); 
       
-      await appState.openBlindBox(); 
+      Map<String, List<String>> pools = {
+        "Dimoo": [
+          "assets/avatars/dimoo/dimoo_new_1.png", 
+          "assets/avatars/dimoo/dimoo_new_2.png", 
+          "assets/avatars/dimoo/dimoo_new_3.png", 
+          "assets/avatars/dimoo/dimoo_new_4.png", 
+        ],
+        "GX Series": [
+          "assets/avatars/goxey/gx1.png",
+          "assets/avatars/goxey/gx2.jpg",
+          "assets/avatars/goxey/gx3.jpg",
+          "assets/avatars/goxey/gx4.png",
+          "assets/avatars/goxey/gx5.jpg",
+          "assets/avatars/goxey/gx6.png",
+        ],
+        "Molly": ["assets/avatars/molly/molly1.webp", "assets/avatars/molly/molly2.webp", "assets/avatars/molly/molly3.webp"],
+        "Crybaby": ["assets/avatars/crybaby/crybaby1.webp", "assets/avatars/crybaby/crybaby2.webp"],
+      };
 
+      if (_isHidden && (widget.seriesName == "Dimoo" || widget.seriesName == "GX Series")) {
+        _revealedAvatarUrl = widget.seriesName == "Dimoo" 
+            ? "assets/avatars/dimoo/dimoo_hidden.png" 
+            : "assets/avatars/goxey/gx_hidden.png";
+      } else {
+        List<String> pool = pools[widget.seriesName] ?? pools["GX Series"]!;
+        _revealedAvatarUrl = (pool..shuffle()).first;
+      }
+
+      await appState.openBlindBox(); 
+      
+      if (!_isHidden) {
+        Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+          widget.seriesName, 
+          _revealedAvatarUrl
+        );
+      }
       setState(() => _isRevealed = true);
     }
+  }
+
+  void _handleConfirmCustom() {
+    final pool = (widget.seriesName == "Dimoo" ? _dimooCustomPool : _gxCustomPool);
+    final finalAvatar = pool[_customIndex];
+    Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+      widget.seriesName, 
+      finalAvatar
+    );
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(
@@ -122,7 +141,6 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Top Bar
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Row(
@@ -139,265 +157,243 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: GoXeyColors.neonLime.withOpacity(0.1),
+                                  color: Colors.white10,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.5)),
+                                  border: Border.all(color: Colors.white10),
                                 ),
                                 child: Text(
                                   "BOXES: ${appState.availableBoxes}",
-                                  style: const TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 12),
+                                  style: const TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 10),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        
-                        const SizedBox(height: 40),
-                        const SizedBox(height: 20),
-                  
-                  if (!_isRevealed) ...[
-                    ZoomIn(
-                      duration: const Duration(milliseconds: 500),
-                      child: Column(
-                        children: [
-                          if (!_isOpened)
-                            Hero(
-                              tag: 'box_${widget.seriesName}',
-                              child: Icon(Icons.inventory_2, size: 180, color: widget.seriesName == "GoXey Original" ? GoXeyColors.neonLime : GoXeyColors.radicalRed),
-                            )
-                          else
-                            Lottie.network(
-                              'https://lottie.host/6168532c-3543-4414-8789-940733835697/xYmR7H5S0I.json',
-                              repeat: false,
-                              height: 300,
-                              errorBuilder: (context, error, stackTrace) => const SizedBox(height: 300, child: Center(child: CircularProgressIndicator(color: GoXeyColors.neonLime))),
-                            ),
-                          const SizedBox(height: 40),
-                          Text(
-                            _isOpened ? "OPENING..." : "MYSTERY BOX",
-                            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ] else ...[
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 800),
-                      child: Column(
-                        children: [
-                          if (_isHidden)
-                            Pulse(
-                              infinite: true,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700),
-                                  borderRadius: BorderRadius.circular(20),
+                        Column(
+                          children: [
+                            if (_isRevealed)
+                              FadeInDown(
+                                duration: const Duration(milliseconds: 800),
+                                child: Text(
+                                  _isHidden ? "HIDDEN EDITION" : "NORMAL EDITION",
+                                  style: TextStyle(
+                                    color: _isHidden ? const Color(0xFFFFD700) : Colors.white38, 
+                                    fontWeight: FontWeight.bold, 
+                                    fontSize: 12, 
+                                    letterSpacing: 2
+                                  ),
                                 ),
-                                child: const Text(
-                                  "✨ HIDDEN EDITION ✨",
-                                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
+                              )
+                            else
+                              const Text(
+                                "NORMAL EDITION",
+                                style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 2),
                               ),
-                            )
-                          else
-                            const Text(
-                              "NORMAL EDITION",
-                              style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 2),
-                            ),
-                          
-                          const SizedBox(height: 30),
-                          
-                          if (_revealedAvatarUrl.isEmpty)
-                            SizedBox(
-                              height: 400,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.auto_awesome, size: 80, color: GoXeyColors.neonLime.withOpacity(0.5)),
-                                    const SizedBox(height: 24),
-                                    const Text(
-                                      "REWARD UNDER\nDEVELOPMENT",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: GoXeyColors.neonLime,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 2,
+                            const SizedBox(height: 30),
+                            if (!_isRevealed)
+                              SizedBox(
+                                height: 400,
+                                child: Center(
+                                  child: _isOpened 
+                                    ? Lottie.network(
+                                        'https://assets10.lottiefiles.com/packages/lf20_6wutsrox.json',
+                                        height: 300,
+                                      )
+                                    : Image.asset(
+                                        'assets/series/${widget.seriesName.toLowerCase().replaceAll(' ', '_')}.jpg',
+                                        height: 300,
+                                        errorBuilder: (context, error, stackTrace) => Icon(Icons.inventory_2, size: 200, color: Colors.white10),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      "Stay tuned for the official launch!",
-                                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14),
-                                    ),
-                                  ],
                                 ),
-                              ),
-                            )
-                          else
-                            Column(
-                              children: [
-                                if (_isCustomizing)
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 400,
-                                        child: ScrollConfiguration(
-                                          behavior: _CustomScrollBehavior(),
-                                          child: PageView.builder(
-                                            controller: PageController(viewportFraction: 0.85, initialPage: 1000), 
-                                            physics: const AlwaysScrollableScrollPhysics(),
-                                            onPageChanged: (idx) => setState(() => _customIndex = idx % 10),
-                                            itemBuilder: (context, index) {
-                                              final realIdx = index % 10;
-                                              return AnimatedScale(
-                                                scale: _customIndex == realIdx ? 1.0 : 0.8,
-                                                duration: const Duration(milliseconds: 300),
-                                                child: AvatarViewer(
-                                                  modelUrl: _dimooCustomPool[realIdx],
-                                                  showBackground: false,
-                                                  height: 400,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: List.generate(10, (index) => Container(
-                                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                                          width: 6,
-                                          height: 6,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _customIndex == index ? GoXeyColors.neonLime : Colors.white24,
-                                          ),
-                                        )),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const Text(
-                                        "Swipe to Change Color",
-                                        style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 14),
-                                      ),
-                                    ],
-                                  )
-                                else
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 400,
-                                        child: AvatarViewer(
-                                          modelUrl: _revealedAvatarUrl,
-                                          showBackground: false,
-                                          height: 400,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        _isHidden ? "LEGENDARY PULL!" : "Sweet Catch!",
-                                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 20),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Column(
-                      children: [
-                        if (!_isRevealed)
-                          ElevatedButton(
-                            onPressed: _isOpened ? null : _handleOpen,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: GoXeyColors.neonLime,
-                              minimumSize: const Size(double.infinity, 64),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            ),
-                            child: const Text("TAP TO UNBOX", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
-                          )
-                        else
-                          Column(
-                            children: [
-                              if (_isHidden && widget.seriesName == "Dimoo" && !_isCustomizing) ...[
-                                ElevatedButton(
-                                  onPressed: () => setState(() => _isCustomizing = true),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white10,
-                                    side: const BorderSide(color: GoXeyColors.neonLime),
-                                    minimumSize: const Size(double.infinity, 56),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.palette_outlined, color: GoXeyColors.neonLime),
-                                      SizedBox(width: 12),
-                                      Text("CUSTOMIZE STYLE", style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                              Row(
+                              )
+                            else
+                              Column(
                                 children: [
-                                  Expanded(
-                                    child: OutlinedButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(color: Colors.white24),
-                                        minimumSize: const Size(0, 64),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                      ),
-                                      child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                  if (appState.availableBoxes > 0) ...[
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () => setState(() { 
-                                          _isOpened = false; 
-                                          _isRevealed = false; 
-                                          _isHidden = false; 
-                                          _isCustomizing = false;
-                                        }),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: GoXeyColors.neonLime,
-                                          minimumSize: const Size(0, 64),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  if (_isCustomizing)
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 400,
+                                          child: ScrollConfiguration(
+                                            behavior: _CustomScrollBehavior(),
+                                            child: PageView.builder(
+                                              controller: PageController(viewportFraction: 0.85, initialPage: 1000), 
+                                              physics: const AlwaysScrollableScrollPhysics(),
+                                              onPageChanged: (idx) => setState(() => _customIndex = idx % (widget.seriesName == "Dimoo" ? 10 : 4)),
+                                              itemBuilder: (context, index) {
+                                                final realIdx = index % (widget.seriesName == "Dimoo" ? 10 : 4);
+                                                return AnimatedScale(
+                                                  scale: _customIndex == realIdx ? 1.0 : 0.8,
+                                                  duration: const Duration(milliseconds: 300),
+                                                  child: AvatarViewer(
+                                                    modelUrl: widget.seriesName == "Dimoo" 
+                                                      ? _dimooCustomPool[realIdx]
+                                                      : _gxCustomPool[realIdx],
+                                                    showBackground: false,
+                                                    height: 400,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
                                         ),
-                                        child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                                      ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: List.generate(widget.seriesName == "Dimoo" ? 10 : 4, (index) => Container(
+                                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                                            width: 6,
+                                            height: 6,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: _customIndex == index ? GoXeyColors.neonLime : Colors.white24,
+                                            ),
+                                          )),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const Text(
+                                          "Swipe to Change Design",
+                                          style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 14),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 400,
+                                          child: AvatarViewer(
+                                            modelUrl: _revealedAvatarUrl,
+                                            showBackground: false,
+                                            height: 400,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          _isHidden ? "CONGRATULATIONS!" : "Sweet Catch!",
+                                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
+                                        ),
+                                      ],
                                     ),
-                                  ],
                                 ],
                               ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Column(
+                            children: [
+                              if (!_isRevealed)
+                                ElevatedButton(
+                                  onPressed: _isOpened ? null : _handleOpen,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: GoXeyColors.neonLime,
+                                    minimumSize: const Size(double.infinity, 64),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  ),
+                                  child: const Text("TAP TO UNBOX", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    if (_isHidden && (widget.seriesName == "Dimoo" || widget.seriesName == "GX Series") && !_isCustomizing) ...[
+                                      ElevatedButton(
+                                        onPressed: () => setState(() => _isCustomizing = true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white10,
+                                          side: const BorderSide(color: GoXeyColors.neonLime),
+                                          minimumSize: const Size(double.infinity, 56),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.palette_outlined, color: GoXeyColors.neonLime),
+                                            SizedBox(width: 12),
+                                            Text("CUSTOMIZE STYLE", style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                    if (_isCustomizing)
+                                      ElevatedButton(
+                                        onPressed: _handleConfirmCustom,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: GoXeyColors.neonLime,
+                                          minimumSize: const Size(double.infinity, 64),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        ),
+                                        child: const Text("CONFIRM SELECTION", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                                      )
+                                    else
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                if (_isHidden) {
+                                                  Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+                                                    widget.seriesName, 
+                                                    _revealedAvatarUrl
+                                                  );
+                                                }
+                                                Navigator.pop(context);
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                side: const BorderSide(color: Colors.white24),
+                                                minimumSize: const Size(0, 64),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                              ),
+                                              child: const Text("SAVE & CLOSE", style: TextStyle(color: Colors.white)),
+                                            ),
+                                          ),
+                                          if (appState.availableBoxes > 0) ...[
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  if (_isHidden) {
+                                                    Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+                                                      widget.seriesName, 
+                                                      _revealedAvatarUrl
+                                                    );
+                                                  }
+                                                  setState(() { 
+                                                    _isOpened = false; 
+                                                    _isRevealed = false; 
+                                                    _isHidden = false; 
+                                                    _isCustomizing = false;
+                                                    _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png";
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: GoXeyColors.neonLime,
+                                                  minimumSize: const Size(0, 64),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                ),
+                                                child: const Text("NEXT BOX", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                  ],
+                                ),
                             ],
                           ),
+                        ),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
-        );
-      },
-    ),
-  ),
-),
-);
+        ),
+      ),
+    );
   }
 }

@@ -61,13 +61,23 @@ class _DashboardPageState extends State<DashboardPage> {
               controller: amountController,
               keyboardType: TextInputType.number,
               autofocus: true,
-              style: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: GoXeyColors.neonLime,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
               decoration: InputDecoration(
                 prefixText: "RM ",
-                prefixStyle: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24),
+                prefixStyle: const TextStyle(
+                  color: GoXeyColors.neonLime,
+                  fontSize: 24,
+                ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -75,7 +85,10 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white38),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -85,7 +98,9 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Successfully added RM ${amount.toStringAsFixed(2)}!"),
+                    content: Text(
+                      "Successfully added RM ${amount.toStringAsFixed(2)}!",
+                    ),
                     backgroundColor: GoXeyColors.neonLime,
                     duration: const Duration(seconds: 2),
                   ),
@@ -99,7 +114,9 @@ class _DashboardPageState extends State<DashboardPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: GoXeyColors.neonLime,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text("Confirm"),
           ),
@@ -118,7 +135,10 @@ class _DashboardPageState extends State<DashboardPage> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text("Add to ${pocket.name}", style: const TextStyle(color: Colors.white)),
+        title: Text(
+          "Add to ${pocket.name}",
+          style: const TextStyle(color: Colors.white),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -131,13 +151,23 @@ class _DashboardPageState extends State<DashboardPage> {
               controller: amountController,
               keyboardType: TextInputType.number,
               autofocus: true,
-              style: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: GoXeyColors.neonLime,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
               decoration: InputDecoration(
                 prefixText: "RM ",
-                prefixStyle: const TextStyle(color: GoXeyColors.neonLime, fontSize: 24),
+                prefixStyle: const TextStyle(
+                  color: GoXeyColors.neonLime,
+                  fontSize: 24,
+                ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -145,7 +175,10 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white38),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -156,21 +189,27 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Transferred RM ${amount.toStringAsFixed(2)} to ${pocket.name}!"),
+                    content: Text(
+                      "Transferred RM ${amount.toStringAsFixed(2)} to ${pocket.name}!",
+                    ),
                     backgroundColor: GoXeyColors.neonLime,
                     duration: const Duration(seconds: 2),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Invalid amount or insufficient balance")),
+                  const SnackBar(
+                    content: Text("Invalid amount or insufficient balance"),
+                  ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: GoXeyColors.neonLime,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text("Confirm"),
           ),
@@ -190,11 +229,22 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 24),
             const Text(
               "QR PAYMENT: WANT DETECTED",
-              style: TextStyle(color: GoXeyColors.radicalRed, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+              style: TextStyle(
+                color: GoXeyColors.radicalRed,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -208,13 +258,21 @@ class _DashboardPageState extends State<DashboardPage> {
               label: "CONFIRM RM 400.00",
               onSuccess: () {
                 Navigator.pop(context);
-                SpendVisualizer.show(context, amount: 400, item: "Maggi", count: 200);
+                SpendVisualizer.show(
+                  context,
+                  amount: 400,
+                  item: "Maggi",
+                  count: 200,
+                );
               },
             ),
             const SizedBox(height: 24),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("I regret my choices", style: TextStyle(color: Colors.white38)),
+              child: const Text(
+                "I regret my choices",
+                style: TextStyle(color: Colors.white38),
+              ),
             ),
           ],
         ),
@@ -245,8 +303,14 @@ class _DashboardPageState extends State<DashboardPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: isGoxey
-                ? [const Color(0xFF212427), const Color(0xFF212427)] // Solid #212427
-                : [GoXeyColors.gxBgTop, GoXeyColors.gxBgBottom], // GXBank Classic
+                ? [
+                    const Color(0xFF212427),
+                    const Color(0xFF212427),
+                  ] // Solid #212427
+                : [
+                    GoXeyColors.gxBgTop,
+                    GoXeyColors.gxBgBottom,
+                  ], // GXBank Classic
           ),
         ),
         child: SafeArea(
@@ -286,7 +350,11 @@ class _DashboardPageState extends State<DashboardPage> {
             ignoring: !isGoxey,
             child: Column(
               children: [
-                _buildAccountsSection(isGoxey, appState.totalBalance, appState.pocketsBalance),
+                _buildAccountsSection(
+                  isGoxey,
+                  appState.totalBalance,
+                  appState.pocketsBalance,
+                ),
                 const SizedBox(height: 24),
                 if (isGoxey) ...[
                   _buildAvatarBlindBoxSection(),
@@ -356,7 +424,11 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: () => _showFunctionalityToast("Support"),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white, size: 24),
+            icon: const Icon(
+              Icons.notifications_none,
+              color: Colors.white,
+              size: 24,
+            ),
             onPressed: () => _showFunctionalityToast("Notifications"),
           ),
         ],
@@ -384,7 +456,9 @@ class _DashboardPageState extends State<DashboardPage> {
           Row(
             children: [
               Text(
-                _isBalanceVisible ? "RM${balance.toStringAsFixed(2)}" : "RM *****",
+                _isBalanceVisible
+                    ? "RM${balance.toStringAsFixed(2)}"
+                    : "RM *****",
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
@@ -397,7 +471,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   color: Colors.white70,
                   size: 20,
                 ),
-                onPressed: () => setState(() => _isBalanceVisible = !_isBalanceVisible),
+                onPressed: () =>
+                    setState(() => _isBalanceVisible = !_isBalanceVisible),
               ),
             ],
           ),
@@ -422,14 +497,36 @@ class _DashboardPageState extends State<DashboardPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildActionCircle(Icons.add, "Add money", isGoxey, _showAddMoneyDialog),
-        _buildActionCircle(Icons.qr_code_scanner, "Scan QR", isGoxey, () => isGoxey ? _triggerQrPaymentFriction() : _showFunctionalityToast("Scan QR")),
-        _buildActionCircle(Icons.send, "Send money", isGoxey, () => _showFunctionalityToast("Send Money")),
+        _buildActionCircle(
+          Icons.add,
+          "Add money",
+          isGoxey,
+          _showAddMoneyDialog,
+        ),
+        _buildActionCircle(
+          Icons.qr_code_scanner,
+          "Scan QR",
+          isGoxey,
+          () => isGoxey
+              ? _triggerQrPaymentFriction()
+              : _showFunctionalityToast("Scan QR"),
+        ),
+        _buildActionCircle(
+          Icons.send,
+          "Send money",
+          isGoxey,
+          () => _showFunctionalityToast("Send Money"),
+        ),
       ],
     );
   }
 
-  Widget _buildActionCircle(IconData icon, String label, bool isGoxey, VoidCallback onTap) {
+  Widget _buildActionCircle(
+    IconData icon,
+    String label,
+    bool isGoxey,
+    VoidCallback onTap,
+  ) {
     return Column(
       children: [
         Container(
@@ -440,10 +537,7 @@ class _DashboardPageState extends State<DashboardPage> {
             shape: BoxShape.circle,
             boxShadow: [
               if (isGoxey)
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.1),
-                  blurRadius: 10,
-                )
+                BoxShadow(color: Colors.white.withOpacity(0.1), blurRadius: 10),
             ],
           ),
           child: IconButton(
@@ -452,29 +546,39 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     );
   }
 
-  Widget _buildAccountsSection(bool isGoxey, double totalBalance, double pocketsBalance) {
+  Widget _buildAccountsSection(
+    bool isGoxey,
+    double totalBalance,
+    double pocketsBalance,
+  ) {
     return Consumer<PocketProvider>(
       builder: (context, pocketProvider, _) {
         final pockets = pocketProvider.pockets;
         // Build all cards: Main Account + one per pocket
         final cards = <Widget>[
-          _buildAccountCard("Main Account", "RM${totalBalance.toStringAsFixed(2)}", null, isGoxey, members: [], onTap: _showAddMoneyDialog),
-          ...pockets.map((p) => _buildAccountCard(
-            p.name,
-            "RM${p.saved.toStringAsFixed(2)} / RM${p.target.toStringAsFixed(2)}",
-            "${(p.saved / p.target * 100).clamp(0, 100).toStringAsFixed(0)}% saved",
+          _buildAccountCard(
+            "Main Account",
+            "RM${totalBalance.toStringAsFixed(2)}",
+            null,
             isGoxey,
-            members: p.members,
-            onTap: () => _showPocketMoneyDialog(p),
-          )),
+            members: [],
+            onTap: _showAddMoneyDialog,
+          ),
+          ...pockets.map(
+            (p) => _buildAccountCard(
+              p.name,
+              "RM${p.saved.toStringAsFixed(2)} / RM${p.target.toStringAsFixed(2)}",
+              "${(p.saved / p.target * 100).clamp(0, 100).toStringAsFixed(0)}% saved",
+              isGoxey,
+              members: p.members,
+              onTap: () => _showPocketMoneyDialog(p),
+            ),
+          ),
         ];
 
         return Padding(
@@ -487,13 +591,25 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   const Text(
                     "Your everyday account",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                  Row(children: [
-                    const Icon(Icons.swipe, color: Colors.white38, size: 16),
-                    const SizedBox(width: 4),
-                    Text("${cards.length} accounts", style: const TextStyle(color: Colors.white38, fontSize: 12)),
-                  ]),
+                  Row(
+                    children: [
+                      const Icon(Icons.swipe, color: Colors.white38, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${cards.length} accounts",
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -515,7 +631,14 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildAccountCard(String title, String balance, String? promo, bool isGoxey, {List<String> members = const [], VoidCallback? onTap}) {
+  Widget _buildAccountCard(
+    String title,
+    String balance,
+    String? promo,
+    bool isGoxey, {
+    List<String> members = const [],
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -523,22 +646,31 @@ class _DashboardPageState extends State<DashboardPage> {
         height: 200,
         decoration: BoxDecoration(
           color: isGoxey ? null : GoXeyColors.gxDarkCard,
-          gradient: isGoxey ? const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF9D00F2), Color(0xFFEE2677)],
-          ) : null,
+          gradient: isGoxey
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF9D00F2), Color(0xFFEE2677)],
+                )
+              : null,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
             const SizedBox(height: 8),
             Text(
               balance,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             if (promo != null) ...[
               const SizedBox(height: 8),
@@ -550,7 +682,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
                 child: Text(
                   promo,
-                  style: const TextStyle(color: GoXeyColors.gxCyan, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: GoXeyColors.gxCyan,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -558,12 +694,19 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Icon(Icons.people_outline, color: Colors.white38, size: 13),
+                  const Icon(
+                    Icons.people_outline,
+                    color: Colors.white38,
+                    size: 13,
+                  ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       "Me, ${members.join(', ')}",
-                      style: const TextStyle(color: Colors.white38, fontSize: 11),
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 11,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -588,7 +731,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   final List<Map<String, dynamic>> _seriesOptions = [
     {
-      "name": "GoXey Original",
+      "name": "GX Series",
       "tag": "IP SERIES 1",
       "color": GoXeyColors.neonLime,
       "poster": "assets/avatars/avatar_1.jpg",
@@ -636,7 +779,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     // Ensure initial page results in index 0 (GoXey Original)
     // 5005 is a multiple of 7 (our series count)
-    _currentSeriesPage = 5005; 
+    _currentSeriesPage = 5005;
   }
 
   Widget _buildAvatarBlindBoxSection() {
@@ -650,115 +793,155 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               Text(
                 "Series Collection",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               Text(
                 "SWIPE SERIES",
-                style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
+                style: TextStyle(
+                  color: Colors.white38,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  letterSpacing: 1.2,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           // Series Carousel (Infinite Loop)
-        SizedBox(
-          height: 420,
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(
-              dragDevices: {
-                PointerDeviceKind.touch,
-                PointerDeviceKind.mouse,
-              },
-            ),
-            child: PageView.builder(
-              controller: PageController(
-                viewportFraction: 0.85,
-                initialPage: _currentSeriesPage,
+          SizedBox(
+            height: 420,
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
               ),
-              itemCount: _infiniteSeriesCount,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentSeriesPage = index;
-                  _selectedSeriesIndex = index % _seriesOptions.length;
-                });
-              },
-              itemBuilder: (context, index) {
-                final actualIndex = index % _seriesOptions.length;
-                final series = _seriesOptions[actualIndex];
-                bool isSelected = _selectedSeriesIndex == actualIndex;
-                bool hasPoster = series.containsKey('poster') && series['name'] != "GoXey Original";
-                
-                return AnimatedScale(
-                  scale: isSelected ? 1.0 : 0.9,
-                  duration: const Duration(milliseconds: 300),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.white.withOpacity(0.05) : Colors.black12,
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        color: isSelected ? series['color'].withOpacity(0.5) : Colors.white10,
-                        width: 2,
+              child: PageView.builder(
+                controller: PageController(
+                  viewportFraction: 0.85,
+                  initialPage: _currentSeriesPage,
+                ),
+                itemCount: _infiniteSeriesCount,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentSeriesPage = index;
+                    _selectedSeriesIndex = index % _seriesOptions.length;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final actualIndex = index % _seriesOptions.length;
+                  final series = _seriesOptions[actualIndex];
+                  bool isSelected = _selectedSeriesIndex == actualIndex;
+                  bool hasPoster =
+                      series.containsKey('poster') &&
+                      series['name'] != "NONE";
+
+                  return AnimatedScale(
+                    scale: isSelected ? 1.0 : 0.9,
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.white.withOpacity(0.05)
+                            : Colors.black12,
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(
+                          color: isSelected
+                              ? series['color'].withOpacity(0.5)
+                              : Colors.white10,
+                          width: 2,
+                        ),
+                        image: hasPoster
+                            ? DecorationImage(
+                                image: AssetImage(series['poster']),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                  Colors.black.withOpacity(
+                                    isSelected ? 0.4 : 0.7,
+                                  ),
+                                  BlendMode.darken,
+                                ),
+                              )
+                            : null,
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: series['color'].withOpacity(0.2),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                ),
+                              ]
+                            : [],
                       ),
-                      image: hasPoster ? DecorationImage(
-                        image: AssetImage(series['poster']),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(isSelected ? 0.4 : 0.7),
-                          BlendMode.darken,
-                        ),
-                      ) : null,
-                      boxShadow: isSelected ? [
-                        BoxShadow(color: series['color'].withOpacity(0.2), blurRadius: 20, spreadRadius: 5)
-                      ] : [],
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 24),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: series['color'].withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(8),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 24),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: series['color'].withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    series['tag'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  series['tag'],
-                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                                const SizedBox(height: 12),
+                                Text(
+                                  series['name'].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                series['name'].toUpperCase(),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 2),
-                              ),
-                              const Spacer(),
-                              Hero(
-                                tag: 'box_${series['name']}',
-                                child: Icon(Icons.inventory_2, size: 120, color: series['color']),
-                              ),
-                              const SizedBox(height: 40),
-                            ],
+                                const Spacer(),
+                                Hero(
+                                  tag: 'box_${series['name']}',
+                                  child: Icon(
+                                    Icons.inventory_2,
+                                    size: 120,
+                                    color: series['color'],
+                                  ),
+                                ),
+                                const SizedBox(height: 40),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
-        ),
           const SizedBox(height: 24),
           Consumer2<AppState, PocketProvider>(
             builder: (context, appState, pocketProvider, child) {
               final totalSaved = pocketProvider.totalSaved;
               final currentProgress = totalSaved % 200;
               final percent = currentProgress / 200;
-              final availableBoxes = (totalSaved ~/ 200) - appState.usedBoxesCount;
-              
+              final availableBoxes =
+                  (totalSaved ~/ 200) - appState.usedBoxesCount;
+
               return Column(
                 children: [
                   Row(
@@ -769,22 +952,38 @@ class _DashboardPageState extends State<DashboardPage> {
                         children: [
                           const Text(
                             "NEXT MYSTERY BOX",
-                            style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             "RM ${currentProgress.toStringAsFixed(0)} / RM 200",
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           Text(
                             "RM ${(200 - currentProgress).toStringAsFixed(0)} left to redeem",
-                            style: const TextStyle(color: Colors.white54, fontSize: 11),
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
                       Text(
                         "${(percent * 100).toInt()}%",
-                        style: const TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 12),
+                        style: const TextStyle(
+                          color: GoXeyColors.neonLime,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -801,25 +1000,39 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   const SizedBox(height: 24),
                   _buildAvatarAction(
-                    availableBoxes > 0 
-                      ? "Open ${_seriesOptions[_selectedSeriesIndex]['name']} (${availableBoxes})" 
-                      : "Open ${_seriesOptions[_selectedSeriesIndex]['name']}",
+                    availableBoxes > 0
+                        ? "Open ${_seriesOptions[_selectedSeriesIndex]['name']} (${availableBoxes})"
+                        : "Open ${_seriesOptions[_selectedSeriesIndex]['name']}",
                     Icons.card_giftcard,
-                    availableBoxes > 0 
-                      ? () {
-                          final seriesName = _seriesOptions[_selectedSeriesIndex]['name'];
-                          if (seriesName == "Dimoo" || seriesName == "GoXey Original") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BlindBoxPage(seriesName: seriesName),
-                              ),
-                            );
-                          } else {
-                            _showFunctionalityToast("$seriesName Coming Soon");
+                    availableBoxes > 0
+                        ? () {
+                            final seriesName =
+                                _seriesOptions[_selectedSeriesIndex]['name'];
+                            if (seriesName == "Dimoo" ||
+                                seriesName == "GX Series" ||
+                                seriesName == "Molly" ||
+                                seriesName == "Crybaby") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BlindBoxPage(
+                                    seriesName: seriesName,
+                                    pocketName:
+                                        pocketProvider.pockets.isNotEmpty
+                                        ? pocketProvider.pockets.first.name
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _showFunctionalityToast(
+                                "$seriesName Coming Soon",
+                              );
+                            }
                           }
-                        }
-                      : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
+                        : () => _showFunctionalityToast(
+                            "Save RM 200 more to unlock!",
+                          ),
                     isHighlight: availableBoxes > 0,
                   ),
                 ],
@@ -831,27 +1044,40 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildAvatarAction(String label, IconData icon, VoidCallback onTap, {bool isHighlight = false}) {
+  Widget _buildAvatarAction(
+    String label,
+    IconData icon,
+    VoidCallback onTap, {
+    bool isHighlight = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isHighlight ? GoXeyColors.neonLime.withOpacity(0.2) : Colors.white,
+          color: isHighlight
+              ? GoXeyColors.neonLime.withOpacity(0.2)
+              : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isHighlight ? GoXeyColors.neonLime : Colors.white10),
+          border: Border.all(
+            color: isHighlight ? GoXeyColors.neonLime : Colors.white10,
+          ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: isHighlight ? GoXeyColors.neonLime : Colors.black, size: 20),
+            Icon(
+              icon,
+              color: isHighlight ? GoXeyColors.neonLime : Colors.black,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                label, 
+                label,
                 style: TextStyle(
-                  color: isHighlight ? GoXeyColors.neonLime : Colors.black, 
-                  fontSize: 12, 
-                  fontWeight: FontWeight.bold
+                  color: isHighlight ? GoXeyColors.neonLime : Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -870,19 +1096,29 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           const Text(
             "For you today",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isGoxey ? Colors.white.withOpacity(0.1) : GoXeyColors.gxDarkCard,
+              color: isGoxey
+                  ? Colors.white.withOpacity(0.1)
+                  : GoXeyColors.gxDarkCard,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: Colors.white10),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet_outlined, color: Colors.greenAccent, size: 40),
+                const Icon(
+                  Icons.account_balance_wallet_outlined,
+                  color: Colors.greenAccent,
+                  size: 40,
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -890,7 +1126,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       const Text(
                         "Bonus Pockets",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Text(
                         "Earn up to 3.55% p.a. interest. No penalty.",
@@ -904,9 +1143,17 @@ class _DashboardPageState extends State<DashboardPage> {
                           foregroundColor: Colors.black,
                           minimumSize: const Size(100, 32),
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                        child: const Text("Explore", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          "Explore",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -923,7 +1170,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Consumer<AppState>(
       builder: (context, appState, child) {
         final isGoxey = appState.isGoxeyMode;
-        
+
         List<BottomNavigationBarItem> navItems = [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
@@ -931,15 +1178,22 @@ class _DashboardPageState extends State<DashboardPage> {
             label: isGoxey ? "History" : "Rewards",
           ),
           BottomNavigationBarItem(
-            icon: Icon(isGoxey ? Icons.emoji_events_outlined : Icons.widgets_outlined),
+            icon: Icon(
+              isGoxey ? Icons.emoji_events_outlined : Icons.widgets_outlined,
+            ),
             label: isGoxey ? "Squad" : "Discover",
           ),
-          const BottomNavigationBarItem(icon: Icon(Icons.account_circle_outlined), label: "Me"),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle_outlined),
+            label: "Me",
+          ),
         ];
 
         return Theme(
           data: ThemeData(
-            canvasColor: isGoxey ? Colors.white.withOpacity(0.05) : const Color(0xFF0F021F),
+            canvasColor: isGoxey
+                ? Colors.white.withOpacity(0.05)
+                : const Color(0xFF0F021F),
           ),
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
@@ -948,7 +1202,10 @@ class _DashboardPageState extends State<DashboardPage> {
             unselectedItemColor: Colors.white38,
             showSelectedLabels: true,
             showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+            selectedLabelStyle: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
             unselectedLabelStyle: const TextStyle(fontSize: 10),
             onTap: (index) {
               if (!isGoxey && index != 0) {

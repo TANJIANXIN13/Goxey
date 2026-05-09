@@ -76,6 +76,7 @@ flutter:
     - assets/avatars/crybaby/
     - assets/avatars/skullpanda/
     - assets/avatars/goxey/
+    - assets/avatars/molly/
     - assets/series/
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -51,7 +51,7 @@ class SquadPocketsPage extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const SquadDetailPage()),
+                          MaterialPageRoute(builder: (context) => SquadDetailPage(pocket: pocket)),
                         );
                       },
                     ),
@@ -323,7 +323,7 @@ class SquadPocketsPage extends StatelessWidget {
                 final name = nameController.text.trim();
                 final target = double.tryParse(targetController.text) ?? 0;
                 if (name.isNotEmpty && target > 0) {
-                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, List.from(selectedMembers));
+                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, ["Me", ...selectedMembers]);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("\"$name\" pocket created! 🚀"), backgroundColor: GoXeyColors.neonLime),
