@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 import '../core/theme.dart';
 import '../core/app_state.dart';
 import '../core/pocket_provider.dart';
@@ -19,17 +20,64 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
   int _currentCollectionIndex = 0;
 
   final List<Map<String, dynamic>> _squadMembers = [
-    {"name": "Me", "avatar": "assets/avatars/avatar_3.jpg", "isMe": true, "status": "ACTIVE"},
-    {"name": "Liam", "avatar": "assets/avatars/avatar_2.jpg", "isMe": false, "status": "ACTIVE"},
-    {"name": "Chloe", "avatar": "assets/avatars/avatar_5.jpg", "isMe": false, "status": "ACTIVE"},
-    {"name": "Ethan", "avatar": "assets/avatars/avatar_4.jpg", "isMe": false, "status": "GHOST"},
+    {
+      "name": "Me",
+      "avatar": "assets/avatars/avatar_3.jpg",
+      "isMe": true,
+      "status": "ACTIVE",
+      "ownedCollections": {
+        "DIMOO": ["dimoo_new_1.png", "dimoo_new_3.png"],
+        "CRYBABY SERIES": ["crybaby1.webp", "crybaby2.webp", "crybaby5.webp"],
+        "SKULLPANDA": ["skullpanda2.webp", "skullpanda5.webp"],
+        "TWINKLE TWINKLE": ["twinkle twinkle 1.webp", "twinkle twinkle 4.webp"],
+      },
+    },
+    {
+      "name": "Liam",
+      "avatar": "assets/avatars/avatar_2.jpg",
+      "isMe": false,
+      "status": "ACTIVE",
+      "ownedCollections": {
+        "DIMOO": ["dimoo_new_2.png"],
+        "CRYBABY SERIES": ["crybaby3.webp", "crybaby4.webp"],
+        "SKULLPANDA": ["skullpanda1.webp"],
+        "TWINKLE TWINKLE": ["twinkle twinkle 2.webp", "twinkle twinkle 6.webp"],
+      },
+    },
+    {
+      "name": "Chloe",
+      "avatar": "assets/avatars/avatar_5.jpg",
+      "isMe": false,
+      "status": "ACTIVE",
+      "ownedCollections": {
+        "DIMOO": [
+          "dimoo_new_4.png",
+          "dimoo_hidden.png",
+        ], // Hidden Edition as requested
+        "CRYBABY SERIES": ["crybaby7.webp", "crybaby8.webp", "crybaby9.webp"],
+        "SKULLPANDA": ["skullpanda7.webp", "skullpanda8.webp"],
+        "TWINKLE TWINKLE": ["twinkle twinkle 5.webp", "twinkle twinkle 8.webp"],
+      },
+    },
+    {
+      "name": "Ethan",
+      "avatar": "assets/avatars/avatar_4.jpg",
+      "isMe": false,
+      "status": "GHOST",
+      "ownedCollections": {
+        "DIMOO": ["dimoo_new_1.png"],
+        "CRYBABY SERIES": ["crybaby1.webp"],
+        "SKULLPANDA": ["skullpanda3.webp"],
+        "TWINKLE TWINKLE": ["twinkle twinkle 7.webp"],
+      },
+    },
   ];
 
   final Map<String, String> _seriesStats = {
-    "CRYBABY SERIES": "5/10",
-    "SKULLPANDA": "3/10",
-    "DIMOO": "3/10",
-    "TWINKLE TWINKLE": "3/10",
+    "CRYBABY SERIES": "Owned Items",
+    "SKULLPANDA": "Owned Items",
+    "DIMOO": "Owned Items",
+    "TWINKLE TWINKLE": "Owned Items",
   };
 
   @override
@@ -78,9 +126,33 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
             const SizedBox(height: 30),
             _buildCollectionSection(context),
             const SizedBox(height: 40),
+            _buildBottomButtons(context),
+            const SizedBox(height: 40),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBottomButtons(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildMainButton(
+            "Showcase to Squad",
+            isPrimary: false,
+            onTap: () => _showShowcaseDialog(context),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildMainButton(
+            "Redeem New Box",
+            isPrimary: true,
+            onTap: () => _redeemNewBox(context),
+          ),
+        ),
+      ],
     );
   }
 
@@ -98,12 +170,18 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                   TextSpan(text: "TARGET: "),
                   TextSpan(
                     text: "RM5000",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(text: " | SAVED: "),
                   TextSpan(
                     text: "RM2150",
-                    style: TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: GoXeyColors.neonLime,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -120,9 +198,15 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                 decoration: BoxDecoration(
                   color: GoXeyColors.neonLime.withOpacity(0.1),
                   shape: BoxShape.circle,
-                  border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
+                  border: Border.all(
+                    color: GoXeyColors.neonLime.withOpacity(0.3),
+                  ),
                 ),
-                child: const Icon(Icons.add, size: 14, color: GoXeyColors.neonLime),
+                child: const Icon(
+                  Icons.add,
+                  size: 14,
+                  color: GoXeyColors.neonLime,
+                ),
               ),
             ),
           ],
@@ -144,7 +228,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                   height: 12,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [GoXeyColors.radicalRed, GoXeyColors.accentPurple],
+                      colors: [
+                        GoXeyColors.radicalRed,
+                        GoXeyColors.accentPurple,
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
@@ -244,10 +331,26 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
     if (isGhost) {
       avatarWidget = ColorFiltered(
         colorFilter: const ColorFilter.matrix([
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0.2126, 0.7152, 0.0722, 0, 0,
-          0,      0,      0,      1, 0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
         ]),
         child: avatarWidget,
       );
@@ -295,7 +398,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
@@ -315,9 +421,12 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                 const SizedBox(height: 4),
                 Text(
                   badge,
-                  style: TextStyle(fontSize: 10, color: badgeColor ?? Colors.white24),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: badgeColor ?? Colors.white24,
+                  ),
                 ),
-              ]
+              ],
             ],
           ),
         ],
@@ -333,7 +442,9 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              _currentCollectionIndex == 0 ? "YOUR COLLECTION" : "${_squadMembers[_currentCollectionIndex]['name'].toUpperCase()}'S COLLECTION",
+              _currentCollectionIndex == 0
+                  ? "YOUR COLLECTION"
+                  : "${_squadMembers[_currentCollectionIndex]['name'].toUpperCase()}'S COLLECTION",
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -343,146 +454,103 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
             ),
           ],
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         SizedBox(
           height: 340,
           child: Stack(
             children: [
-              // Beautiful Neon S-Curve Rack Background
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: RackPainter(),
-                ),
-              ),
-              // Avatar and Stage (Left Section)
+              // Beautiful Neon L-Spine Rack Background
+              Positioned.fill(child: CustomPaint(painter: RackPainter())),
+
+              // Avatar (Bottom Left) - No background
               Positioned(
-                left: 0,
-                top: 25,
-                width: MediaQuery.of(context).size.width * 0.4,
-                height: 250,
+                left: -15,
+                bottom: -20,
+                width: MediaQuery.of(context).size.width * 0.45,
+                height: 280,
                 child: Stack(
-                  alignment: Alignment.bottomCenter,
+                  alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    // Avatar Stage
-                    Container(
-                      width: 140,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E24),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.6),
-                            blurRadius: 12,
-                            offset: const Offset(0, 8),
-                          )
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Stack(
-                          children: [
-                            // Neon glowing edge
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              height: 3,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [GoXeyColors.gxCyan, GoXeyColors.radicalRed],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: GoXeyColors.gxCyan.withOpacity(0.8),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                     // Avatar
                     Positioned(
-                      bottom: 12,
-                      child: _squadMembers[_currentCollectionIndex]['status'] == "GHOST"
-                        ? ColorFiltered(
-                            colorFilter: const ColorFilter.matrix([
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0.2126, 0.7152, 0.0722, 0, 0,
-                              0,      0,      0,      1, 0,
-                            ]),
-                            child: AvatarViewer(
-                              modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
-                              height: 230,
+                      bottom: 0,
+                      child:
+                          _squadMembers[_currentCollectionIndex]['status'] ==
+                              "GHOST"
+                          ? ColorFiltered(
+                              colorFilter: const ColorFilter.matrix([
+                                0.2126,
+                                0.7152,
+                                0.0722,
+                                0,
+                                0,
+                                0.2126,
+                                0.7152,
+                                0.0722,
+                                0,
+                                0,
+                                0.2126,
+                                0.7152,
+                                0.0722,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                1,
+                                0,
+                              ]),
+                              child: AvatarViewer(
+                                modelUrl:
+                                    _squadMembers[_currentCollectionIndex]['avatar'],
+                                height: 240,
+                                width: 140,
+                                showBackground: false,
+                              ),
+                            )
+                          : AvatarViewer(
+                              modelUrl:
+                                  _squadMembers[_currentCollectionIndex]['avatar'],
+                              height: 240,
                               width: 140,
                               showBackground: false,
                             ),
-                          )
-                        : AvatarViewer(
-                            modelUrl: _squadMembers[_currentCollectionIndex]['avatar'],
-                            height: 230,
-                            width: 140,
-                            showBackground: false,
-                          ),
                     ),
-                    // Left arrow
+                    // Navigation Arrows
                     Positioned(
-                      left: 0,
-                      top: 100,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _currentCollectionIndex = (_currentCollectionIndex - 1) % _squadMembers.length;
-                            if (_currentCollectionIndex < 0) _currentCollectionIndex += _squadMembers.length;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
-                        ),
-                      ),
+                      left: 10,
+                      bottom: 100,
+                      child: _buildNavArrow(Icons.chevron_left, () {
+                        setState(() {
+                          _currentCollectionIndex =
+                              (_currentCollectionIndex - 1) %
+                              _squadMembers.length;
+                          if (_currentCollectionIndex < 0)
+                            _currentCollectionIndex += _squadMembers.length;
+                        });
+                      }),
                     ),
-                    // Right arrow
                     Positioned(
-                      right: 0,
-                      top: 100,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _currentCollectionIndex = (_currentCollectionIndex + 1) % _squadMembers.length;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.chevron_right, color: Colors.white, size: 24),
-                        ),
-                      ),
+                      right: 10,
+                      bottom: 100,
+                      child: _buildNavArrow(Icons.chevron_right, () {
+                        setState(() {
+                          _currentCollectionIndex =
+                              (_currentCollectionIndex + 1) %
+                              _squadMembers.length;
+                        });
+                      }),
                     ),
                   ],
                 ),
               ),
+
               // Shelves (Right Section)
               Positioned(
                 right: 0,
-                top: 15,
-                width: MediaQuery.of(context).size.width * 0.52,
+                top: 10,
+                width: MediaQuery.of(context).size.width * 0.55,
                 child: Column(
                   children: [
                     _buildShelf(1, "CRYBABY SERIES"),
@@ -495,74 +563,135 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
             ],
           ),
         ),
-        const SizedBox(height: 25),
-        Row(
-          children: [
-            Expanded(child: _buildMainButton("Showcase to Squad", isPrimary: false, onTap: () => _showShowcaseDialog(context))),
-            const SizedBox(width: 12),
-            Expanded(child: _buildMainButton("Redeem New Box", isPrimary: true, onTap: () => _redeemNewBox(context))),
-          ],
-        ),
       ],
     );
   }
 
+  Widget _buildNavArrow(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
   Widget _buildShelf(int number, String title) {
+    bool isDimoo = title.contains("DIMOO");
+    bool isTwinkle = title.contains("TWINKLE");
+    bool isSkullpanda = title.contains("SKULLPANDA");
+    bool isCrybaby = title.contains("CRYBABY");
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 25), 
-      height: 50,
+      margin: const EdgeInsets.only(bottom: 20),
+      height: 64,
       child: Stack(
-        clipBehavior: Clip.none,
         children: [
-          // Shelf Title and figurines
+          // Dark Pill Background
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A20).withOpacity(0.8),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+          ),
+
+          // Content
           Padding(
-            padding: const EdgeInsets.only(bottom: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
+                  flex: 3,
                   child: Text(
                     "SHELF $number: $title",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 8,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.8),
-                      letterSpacing: 0.5,
+                      color: Colors.white.withOpacity(0.7),
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ),
-                if (title.contains("DIMOO")) ...[
-                  ...["assets/avatars/dimoo/dimoo_1.png", "assets/avatars/dimoo/dimoo_2.png", "assets/avatars/dimoo/dimoo_3.png"].map(
-                    (path) => Padding(
-                      padding: const EdgeInsets.only(left: 4),
-                      child: Image.asset(path, height: 45, width: 28, fit: BoxFit.contain),
-                    ),
-                  ),
-                ] else if (title.contains("CRYBABY")) ...[
-                   const Icon(Icons.star, color: Colors.amber, size: 20),
-                   const Icon(Icons.star, color: Colors.amber, size: 20),
-                ] else ...[
-                  const Icon(Icons.lock_outline, color: Colors.white12, size: 18),
-                ],
-                const SizedBox(width: 10),
-                // Owned Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: GoXeyColors.neonLime.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    "OWNED: ${_seriesStats[title] ?? '0/10'}",
-                    style: const TextStyle(
-                      color: GoXeyColors.neonLime,
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
+
+                // Figurines
+                Expanded(
+                  flex: 9,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: () {
+                      final member = _squadMembers[_currentCollectionIndex];
+                      final Map<String, dynamic> ownedCollections =
+                          member['ownedCollections'] ?? {};
+                      final List<String> ownedItems = List<String>.from(
+                        ownedCollections[title] ?? [],
+                      );
+
+                      if (ownedItems.isEmpty) {
+                        return [const SizedBox()];
+                      }
+
+                      return ownedItems.map((fileName) {
+                        String folder = "";
+                        if (isDimoo)
+                          folder = "dimoo";
+                        else if (isTwinkle)
+                          folder = "twinkle";
+                        else if (isSkullpanda)
+                          folder = "skullpanda";
+                        else if (isCrybaby)
+                          folder = "crybaby";
+
+                        return Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: Image.asset(
+                              "assets/avatars/$folder/$fileName",
+                              height: 70,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        );
+                      }).toList();
+                    }(),
                   ),
                 ),
+
+                const SizedBox(width: 8),
               ],
+            ),
+          ),
+
+          // Neon Glow Bottom Edge
+          Positioned(
+            bottom: 0,
+            left: 15,
+            right: 15,
+            height: 2,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    GoXeyColors.gxCyan.withOpacity(0.8),
+                    GoXeyColors.radicalRed.withOpacity(0.8),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: GoXeyColors.gxCyan.withOpacity(0.4),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -588,22 +717,30 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
     );
   }
 
-  Widget _buildMainButton(String text, {required bool isPrimary, VoidCallback? onTap}) {
+  Widget _buildMainButton(
+    String text, {
+    required bool isPrimary,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isPrimary ? GoXeyColors.radicalRed : Colors.white.withOpacity(0.05),
+          color: isPrimary
+              ? GoXeyColors.radicalRed
+              : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isPrimary ? Colors.transparent : Colors.white10),
+          border: Border.all(
+            color: isPrimary ? Colors.transparent : Colors.white10,
+          ),
           boxShadow: isPrimary
               ? [
                   BoxShadow(
                     color: GoXeyColors.radicalRed.withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -656,8 +793,13 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
           backgroundColor: const Color(0xFF1A1A1A),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: const Text("Create Shared Pocket", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          title: const Text(
+            "Create Shared Pocket",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -671,7 +813,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     hintStyle: const TextStyle(color: Colors.white24),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -686,51 +831,120 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                     hintStyle: const TextStyle(color: Colors.white24),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text("Invite Members", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Invite Members",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                ...["Liam – 1029384756 (Maybank)", "Chloe – 5647382910 (CIMB)", "Ethan – 9988776655 (Public Bank)"].map((friend) {
+                ...[
+                  "Liam – 1029384756 (Maybank)",
+                  "Chloe – 5647382910 (CIMB)",
+                  "Ethan – 9988776655 (Public Bank)",
+                ].map((friend) {
                   final name = friend.split(' ')[0];
                   final isSelected = selectedMembers.contains(name);
                   return ListTile(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(backgroundColor: Colors.white10, radius: 16, child: const Icon(Icons.person, color: Colors.white54, size: 16)),
-                    title: Text(friend, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.white10,
+                      radius: 16,
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white54,
+                        size: 16,
+                      ),
+                    ),
+                    title: Text(
+                      friend,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
                     trailing: GestureDetector(
                       onTap: () => setDlgState(() {
-                        if (isSelected) selectedMembers.remove(name); else selectedMembers.add(name);
+                        if (isSelected)
+                          selectedMembers.remove(name);
+                        else
+                          selectedMembers.add(name);
                       }),
-                      child: Icon(isSelected ? Icons.check_circle : Icons.add_circle_outline, color: isSelected ? GoXeyColors.neonLime : Colors.white38),
+                      child: Icon(
+                        isSelected
+                            ? Icons.check_circle
+                            : Icons.add_circle_outline,
+                        color: isSelected
+                            ? GoXeyColors.neonLime
+                            : Colors.white38,
+                      ),
                     ),
                   );
                 }),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: () { Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invite link copied!"), backgroundColor: GoXeyColors.neonLime)); },
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Invite link copied!"),
+                        backgroundColor: GoXeyColors.neonLime,
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.share, size: 18, color: Colors.white),
-                  label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  label: const Text(
+                    "Share Invite Link",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.white38),
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
                 final name = nameController.text.trim();
                 final target = double.tryParse(targetController.text) ?? 0;
                 if (name.isNotEmpty && target > 0) {
-                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, List.from(selectedMembers));
+                  Provider.of<PocketProvider>(
+                    context,
+                    listen: false,
+                  ).addPocket(name, target, List.from(selectedMembers));
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"$name" pocket created! 🚀'), backgroundColor: GoXeyColors.neonLime));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('"$name" pocket created! 🚀'),
+                      backgroundColor: GoXeyColors.neonLime,
+                    ),
+                  );
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: GoXeyColors.radicalRed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               child: const Text("Create"),
             ),
           ],
@@ -745,7 +959,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Select Friends", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Select Friends",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         content: SizedBox(
           width: double.maxFinite,
           child: Column(
@@ -753,11 +970,18 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
             children: [
               TextField(
                 decoration: InputDecoration(
-                  hintText: "Search bank account number of friend/family member",
-                  hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                  hintText:
+                      "Search bank account number of friend/family member",
+                  hintStyle: const TextStyle(
+                    color: Colors.white24,
+                    fontSize: 12,
+                  ),
                   filled: true,
                   fillColor: Colors.white.withOpacity(0.05),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                   prefixIcon: const Icon(Icons.search, color: Colors.white24),
                 ),
                 style: const TextStyle(color: Colors.white),
@@ -770,7 +994,11 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                   children: [
                     _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
                     _buildFriendItem(context, "Chloe", "5647382910 (CIMB)"),
-                    _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
+                    _buildFriendItem(
+                      context,
+                      "Ethan",
+                      "9988776655 (Public Bank)",
+                    ),
                   ],
                 ),
               ),
@@ -779,21 +1007,35 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                 onPressed: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
+                    const SnackBar(
+                      content: Text("Link copied to clipboard!"),
+                      backgroundColor: GoXeyColors.neonLime,
+                    ),
                   );
                 },
                 icon: const Icon(Icons.share, size: 18, color: Colors.white),
-                label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+                label: const Text(
+                  "Share Invite Link",
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Done", style: TextStyle(color: GoXeyColors.neonLime))),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              "Done",
+              style: TextStyle(color: GoXeyColors.neonLime),
+            ),
+          ),
         ],
       ),
     );
@@ -801,13 +1043,26 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
   Widget _buildFriendItem(BuildContext context, String name, String details) {
     return ListTile(
-      leading: CircleAvatar(backgroundColor: Colors.white10, child: const Icon(Icons.person, color: Colors.white54)),
+      leading: CircleAvatar(
+        backgroundColor: Colors.white10,
+        child: const Icon(Icons.person, color: Colors.white54),
+      ),
       title: Text(name, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(details, style: const TextStyle(color: Colors.white38, fontSize: 11)),
-      trailing: const Icon(Icons.add_circle_outline, color: GoXeyColors.neonLime),
+      subtitle: Text(
+        details,
+        style: const TextStyle(color: Colors.white38, fontSize: 11),
+      ),
+      trailing: const Icon(
+        Icons.add_circle_outline,
+        color: GoXeyColors.neonLime,
+      ),
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$name added!"), backgroundColor: GoXeyColors.gxPurple, duration: const Duration(seconds: 1)),
+          SnackBar(
+            content: Text("$name added!"),
+            backgroundColor: GoXeyColors.gxPurple,
+            duration: const Duration(seconds: 1),
+          ),
         );
       },
     );
@@ -819,7 +1074,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Add to Squad", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Add to Squad",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -829,7 +1087,10 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                 hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
                 prefixIcon: const Icon(Icons.search, color: Colors.white24),
               ),
               style: const TextStyle(color: Colors.white),
@@ -839,29 +1100,51 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
+                  const SnackBar(
+                    content: Text("Link copied to clipboard!"),
+                    backgroundColor: GoXeyColors.neonLime,
+                  ),
                 );
               },
               icon: const Icon(Icons.share, size: 18, color: Colors.white),
-              label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+              label: const Text(
+                "Share Invite Link",
+                style: TextStyle(color: Colors.white),
+              ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white24),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 minimumSize: const Size(double.infinity, 44),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white38))),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white38),
+            ),
+          ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Invite sent!"), backgroundColor: GoXeyColors.neonLime),
+                const SnackBar(
+                  content: Text("Invite sent!"),
+                  backgroundColor: GoXeyColors.neonLime,
+                ),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: GoXeyColors.radicalRed, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GoXeyColors.radicalRed,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: const Text("Invite"),
           ),
         ],
@@ -876,68 +1159,60 @@ class RackPainter extends CustomPainter {
     final paint = Paint()
       ..shader = const LinearGradient(
         colors: [GoXeyColors.gxCyan, GoXeyColors.radicalRed],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
 
     final glowPaint = Paint()
       ..shader = LinearGradient(
         colors: [
-          GoXeyColors.gxCyan.withOpacity(0.4),
-          GoXeyColors.radicalRed.withOpacity(0.4)
+          GoXeyColors.gxCyan.withOpacity(0.3),
+          GoXeyColors.radicalRed.withOpacity(0.3),
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 8.0
+      ..strokeWidth = 6.0
       ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     final path = Path();
 
-    double shelfXStart = size.width * 0.45; 
-    double shelfXEnd = size.width; 
-    
-    // Y positions of the shelf lines
-    List<double> shelfYLines = [
-      15 + 50.0,           
-      15 + 50.0 + 25 + 50, 
-      15 + (50.0 + 25) * 2 + 50, 
-      15 + (50.0 + 25) * 3 + 50, 
+    // Shelf geometry constants
+    double shelfRightX = size.width;
+    double shelfLeftX = size.width * 0.45;
+
+    // Y positions for the shelves (matching _buildShelf spacing)
+    List<double> shelfY = [
+      10 + 27.0, // Midpoint of shelf 1
+      10 + 54 + 20 + 27.0, // Midpoint of shelf 2
+      10 + (54 + 20) * 2 + 27.0, // Midpoint of shelf 3
+      10 + (54 + 20) * 3 + 27.0, // Midpoint of shelf 4
     ];
 
-    for (int i = 0; i < 4; i++) {
-      // Horizontal shelf line
-      path.moveTo(shelfXStart, shelfYLines[i]);
-      path.lineTo(shelfXEnd, shelfYLines[i]);
-      
-      // Right vertical cap for each shelf
-      path.moveTo(shelfXEnd, shelfYLines[i]);
-      path.lineTo(shelfXEnd, shelfYLines[i] - 15);
-      
-      // Upward curve at left end
-      path.moveTo(shelfXStart, shelfYLines[i]);
-      path.quadraticBezierTo(
-        shelfXStart - 12, shelfYLines[i], 
-        shelfXStart - 12, shelfYLines[i] - 12
-      );
+    // Draw horizontal shelf lines (connecting to the spine)
+    for (int i = 0; i < shelfY.length; i++) {
+      path.moveTo(shelfLeftX - 10, shelfY[i]);
+      path.lineTo(shelfRightX, shelfY[i]);
+
+      // Vertical end cap
+      path.moveTo(shelfRightX, shelfY[i] - 10);
+      path.lineTo(shelfRightX, shelfY[i] + 10);
     }
 
-    // Right vertical spine connecting the caps (aesthetic)
-    path.moveTo(shelfXEnd, shelfYLines[0] - 15);
-    path.lineTo(shelfXEnd, shelfYLines[3]);
+    // Draw the L-shaped vertical spine on the left
+    path.moveTo(shelfLeftX - 10, shelfY[0]);
+    path.lineTo(shelfLeftX - 10, shelfY[3]);
 
-    // Connecting curve from avatar stage
-    double stageBottomY = 25 + 230 + 15; 
-    double stageRightX = 140; 
-    
-    path.moveTo(stageRightX, stageBottomY);
-    path.cubicTo(
-      stageRightX + 30, stageBottomY,
-      shelfXStart - 30, shelfYLines[3],
-      shelfXStart, shelfYLines[3],
+    // Bottom curve of the spine towards the avatar area
+    path.moveTo(shelfLeftX - 10, shelfY[3]);
+    path.quadraticBezierTo(
+      shelfLeftX - 10,
+      shelfY[3] + 40,
+      shelfLeftX - 80,
+      shelfY[3] + 40,
     );
 
     canvas.drawPath(path, glowPaint);

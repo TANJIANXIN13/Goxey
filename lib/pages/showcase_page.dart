@@ -29,9 +29,9 @@ class ShowcasePage extends StatelessWidget {
             name: "Chloe",
             avatarPath: "assets/avatars/avatar_5.jpg",
             time: "5 hours ago",
-            content: "Just opened a DIMOO box and got the Hidden Edition! 🌟",
+            content: "Just opened a DIMOO box and got the DIMOO series! 🌟",
             isBoxUpdate: true,
-            boxImage: "assets/avatars/avatar_5.jpg",
+            boxImage: "assets/avatars/dimoo/dimoo_new_1.png",
           ),
           _buildFeedItem(
             name: "Me",

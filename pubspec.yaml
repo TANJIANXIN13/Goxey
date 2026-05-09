@@ -72,6 +72,9 @@ flutter:
     - assets/avatars/
     - assets/avatars/dimoo/
     - assets/avatars/dimoo/custom/
+    - assets/avatars/twinkle/
+    - assets/avatars/crybaby/
+    - assets/avatars/skullpanda/
     - assets/avatars/goxey/
     - assets/series/
 
