@@ -772,7 +772,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "name": "GX Series",
       "tag": "IP SERIES 1",
       "color": GoXeyColors.neonLime,
-      "poster": "assets/series/goxeyPage.png",
+      "poster": "assets/series/Goxey.jpg",
     },
     {
       "name": "Hirono",

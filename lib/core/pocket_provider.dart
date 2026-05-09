@@ -34,6 +34,8 @@ class Pocket {
 }
 
 class PocketProvider extends ChangeNotifier {
+  final Map<String, int> _pullCounts = {};
+  
   final List<Pocket> _pockets = [
     Pocket(
       name: "Langkawi Trip Fund",
@@ -88,6 +90,7 @@ class PocketProvider extends ChangeNotifier {
   }
 
   void recordBlindBoxOpen(String seriesName, String imagePath) {
+    _pullCounts[seriesName] = (_pullCounts[seriesName] ?? 0) + 1;
     for (var i = 0; i < _pockets.length; i++) {
       _pockets[i].activities.insert(
         0,
@@ -102,4 +105,6 @@ class PocketProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  int getPullCount(String seriesName) => _pullCounts[seriesName] ?? 0;
 }

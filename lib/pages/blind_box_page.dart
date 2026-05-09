@@ -48,10 +48,10 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
   ];
 
   final List<String> _gxCustomPool = [
-    "assets/avatars/goxey/custom/gx_hidden1.jpg",
-    "assets/avatars/goxey/custom/gx_hidden2.jpg",
-    "assets/avatars/goxey/custom/gx_hidden3.jpg",
-    "assets/avatars/goxey/custom/gx_hidden4.jpg",
+    "assets/avatars/goxey/custom/gx_hidden1.png",
+    "assets/avatars/goxey/custom/gx_hidden2.png",
+    "assets/avatars/goxey/custom/gx_hidden3.png",
+    "assets/avatars/goxey/custom/gx_hidden4.png",
   ];
 
   void _handleOpen() async {
@@ -60,8 +60,16 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
     if (mounted) {
       final appState = Provider.of<AppState>(context, listen: false);
       
-      // Increased odds of hidden for testing as requested earlier
-      _isHidden = (DateTime.now().millisecond % 2 == 0); 
+      final pocketProvider = Provider.of<PocketProvider>(context, listen: false);
+      int pullCount = pocketProvider.getPullCount(widget.seriesName);
+      
+      // Rule: No hidden in the first 3 pulls for each series
+      if (pullCount < 3) {
+        _isHidden = false;
+      } else {
+        // Normal odds (e.g., 10% for testing or randomized)
+        _isHidden = (DateTime.now().millisecond % 5 == 0); 
+      }
       
       Map<String, List<String>> pools = {
         "Dimoo": [
@@ -72,10 +80,10 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
         ],
         "GX Series": [
           "assets/avatars/goxey/gx1.png",
-          "assets/avatars/goxey/gx2.jpg",
-          "assets/avatars/goxey/gx3.jpg",
+          "assets/avatars/goxey/gx2.png",
+          "assets/avatars/goxey/gx3.png",
           "assets/avatars/goxey/gx4.png",
-          "assets/avatars/goxey/gx5.jpg",
+          "assets/avatars/goxey/gx5.png",
           "assets/avatars/goxey/gx6.png",
         ],
         "Molly": ["assets/avatars/molly/molly1.webp", "assets/avatars/molly/molly2.webp", "assets/avatars/molly/molly3.webp"],
@@ -88,7 +96,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
             : "assets/avatars/goxey/gx_hidden.png";
       } else {
         List<String> pool = pools[widget.seriesName] ?? pools["GX Series"]!;
-        _revealedAvatarUrl = (pool..shuffle()).first;
+        _revealedAvatarUrl = (List.from(pool)..shuffle()).first;
       }
 
       await appState.openBlindBox(); 
@@ -198,10 +206,16 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                     ? Lottie.network(
                                         'https://assets10.lottiefiles.com/packages/lf20_6wutsrox.json',
                                         height: 300,
+                                        frameBuilder: (context, child, composition) {
+                                          if (composition == null) {
+                                            return const Center(child: CircularProgressIndicator(color: GoXeyColors.neonLime));
+                                          }
+                                          return child;
+                                        },
                                       )
                                     : Image.asset(
                                         widget.seriesName == "GX Series" 
-                                            ? 'assets/series/goxeyPage.png'
+                                            ? 'assets/series/Goxey.jpg'
                                             : 'assets/series/${widget.seriesName.toLowerCase().replaceAll(' ', '_')}.jpg',
                                         height: 300,
                                         errorBuilder: (context, error, stackTrace) => Icon(Icons.inventory_2, size: 200, color: Colors.white10),
