@@ -752,19 +752,38 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
           const SizedBox(height: 24),
-          Consumer<AppState>(
-            builder: (context, appState, child) {
+          Consumer2<AppState, PocketProvider>(
+            builder: (context, appState, pocketProvider, child) {
+              final totalSaved = pocketProvider.totalSaved;
+              final currentProgress = totalSaved % 200;
+              final percent = currentProgress / 200;
+              final availableBoxes = (totalSaved ~/ 200) - appState.usedBoxesCount;
+              
               return Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Next Box: RM ${(200 - (appState.pocketsBalance % 200)).toStringAsFixed(0)} left",
-                        style: const TextStyle(color: Colors.white54, fontSize: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "NEXT MYSTERY BOX",
+                            style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1.2),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "RM ${currentProgress.toStringAsFixed(0)} / RM 200",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            "RM ${(200 - currentProgress).toStringAsFixed(0)} left to redeem",
+                            style: const TextStyle(color: Colors.white54, fontSize: 11),
+                          ),
+                        ],
                       ),
                       Text(
-                        "${(appState.progressToNextBox * 100).toInt()}%",
+                        "${(percent * 100).toInt()}%",
                         style: const TextStyle(color: GoXeyColors.neonLime, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                     ],
@@ -772,7 +791,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   const SizedBox(height: 8),
                   LinearPercentIndicator(
                     lineHeight: 8.0,
-                    percent: appState.progressToNextBox,
+                    percent: percent,
                     backgroundColor: Colors.white10,
                     progressColor: GoXeyColors.neonLime,
                     barRadius: const Radius.circular(4),
@@ -782,11 +801,11 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   const SizedBox(height: 24),
                   _buildAvatarAction(
-                    appState.availableBoxes > 0 
-                      ? "Open ${_seriesOptions[_selectedSeriesIndex]['name']} (${appState.availableBoxes})" 
-                      : "Open Series",
+                    availableBoxes > 0 
+                      ? "Open ${_seriesOptions[_selectedSeriesIndex]['name']} (${availableBoxes})" 
+                      : "Open ${_seriesOptions[_selectedSeriesIndex]['name']}",
                     Icons.card_giftcard,
-                    appState.availableBoxes > 0 
+                    availableBoxes > 0 
                       ? () {
                           final seriesName = _seriesOptions[_selectedSeriesIndex]['name'];
                           if (seriesName == "Dimoo" || seriesName == "GoXey Original") {
@@ -801,7 +820,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           }
                         }
                       : () => _showFunctionalityToast("Save RM 200 more to unlock!"),
-                    isHighlight: appState.availableBoxes > 0,
+                    isHighlight: availableBoxes > 0,
                   ),
                 ],
               );

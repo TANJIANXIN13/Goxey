@@ -25,6 +25,8 @@ class PocketProvider extends ChangeNotifier {
   ];
 
   List<Pocket> get pockets => List.unmodifiable(_pockets);
+  
+  double get totalSaved => _pockets.fold(0, (sum, p) => sum + p.saved);
 
   void addPocket(String name, double target, List<String> members) {
     _pockets.add(Pocket(name: name, target: target, members: members));

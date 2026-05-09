@@ -6,7 +6,7 @@ class AppState extends ChangeNotifier {
   bool _isGoxeyMode = false;
   double _totalBalance = 5000.00;
   double _pocketsBalance = 2150.00;
-  int _usedBoxesCount = 0;
+  int _usedBoxesCount = 10;
   String _avatarUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
 
   bool get isGoxeyMode => _isGoxeyMode;
@@ -14,6 +14,7 @@ class AppState extends ChangeNotifier {
   double get pocketsBalance => _pocketsBalance;
   String get avatarUrl => _avatarUrl;
   bool get hasCreatedAvatar => _avatarUrl != "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
+  int get usedBoxesCount => _usedBoxesCount;
   
   // Every RM 200 gives 1 box
   int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;
@@ -33,7 +34,8 @@ class AppState extends ChangeNotifier {
       _pocketsBalance = 2150.00; // Force to 2150 if it was saved as 0 from previous runs
     }
     
-    _usedBoxesCount = prefs.getInt('usedBoxesCount') ?? 0;
+    _usedBoxesCount = prefs.getInt('usedBoxesCount') ?? 10;
+    if (_usedBoxesCount < 10) _usedBoxesCount = 10;
     _avatarUrl = prefs.getString('avatarUrl') ?? "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
     notifyListeners();
   }
