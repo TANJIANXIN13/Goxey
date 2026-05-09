@@ -193,13 +193,6 @@ class _DashboardPageState extends State<DashboardPage> {
               if (amount > 0 && amount <= appState.totalBalance) {
                 appState.transferToPockets(amount);
                 pocketProvider.addMoneyToPocket(pocket, amount);
-                appState.addTransaction(
-                  name: "Saved to ${pocket.name}",
-                  category: "Savings",
-                  amount: -amount,
-                  icon: Icons.savings_outlined,
-                  color: GoXeyColors.gxCyan,
-                );
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -632,12 +625,14 @@ class _DashboardPageState extends State<DashboardPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Your everyday account",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  const Expanded(
+                    child: Text(
+                      "Your everyday account",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                   Row(
@@ -777,7 +772,7 @@ class _DashboardPageState extends State<DashboardPage> {
       "name": "GX Series",
       "tag": "IP SERIES 1",
       "color": GoXeyColors.neonLime,
-      "poster": "assets/avatars/avatar_1.jpg",
+      "poster": "assets/series/goxeyPage.png",
     },
     {
       "name": "Hirono",

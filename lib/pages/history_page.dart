@@ -191,6 +191,8 @@ class _HistoryPageState extends State<HistoryPage> {
           const SizedBox(height: 32),
           if (isGoxey) ...[
             _buildBeautifiedChart(),
+            const SizedBox(height: 20),
+            _buildSavingsChart(appState),
             const SizedBox(height: 40),
             const Text(
               "Recent Transactions",
@@ -208,58 +210,117 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildBeautifiedChart() {
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        final transactions = appState.transactions;
+        // Filter only negative transactions (spending)
+        final spends = transactions
+            .where((tx) => (tx["amount"] as double) < 0)
+            .map((tx) => (tx["amount"] as double).abs())
+            .toList();
+        
+        final totalSpend = spends.fold(0.0, (sum, item) => sum + item);
+
+        return FadeInDown(
+          child: Container(
+            height: 220,
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: GoXeyColors.radicalRed.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: GoXeyColors.radicalRed.withOpacity(0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Recent Spending", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        Text("RM ${totalSpend.toStringAsFixed(2)}", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: GoXeyColors.radicalRed.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text("SPEND", style: TextStyle(color: GoXeyColors.radicalRed, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                SizedBox(
+                  height: 80,
+                  width: double.infinity,
+                  child: CustomPaint(
+                    painter: _ChartPainter(data: spends.reversed.toList(), color: GoXeyColors.radicalRed),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSavingsChart(AppState appState) {
+    final transactions = appState.transactions;
+    // Filter only positive transactions (savings/income)
+    final savings = transactions
+        .where((tx) => (tx["amount"] as double) >= 0)
+        .map((tx) => (tx["amount"] as double))
+        .toList();
+    
+    final totalSaved = savings.fold(0.0, (sum, item) => sum + item);
+
     return FadeInDown(
+      delay: const Duration(milliseconds: 200),
       child: Container(
-        height: 240,
+        height: 220,
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: GoXeyColors.neonLime.withOpacity(0.05),
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.2)),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Monthly Spending", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    Text("RM 4,280.50", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text("Recent Savings", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text("RM ${totalSaved.toStringAsFixed(2)}", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: GoXeyColors.radicalRed.withOpacity(0.2),
+                    color: GoXeyColors.neonLime.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text("+12%", style: TextStyle(color: GoXeyColors.radicalRed, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: const Text("SAVE", style: TextStyle(color: GoXeyColors.neonLime, fontSize: 10, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
             const Spacer(),
             SizedBox(
-              height: 100,
+              height: 80,
               width: double.infinity,
               child: CustomPaint(
-                painter: _ChartPainter(),
+                painter: _ChartPainter(data: savings.reversed.toList(), color: GoXeyColors.neonLime),
               ),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("MON", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("TUE", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("WED", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("THU", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("FRI", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("SAT", style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text("SUN", style: TextStyle(color: Colors.white38, fontSize: 10)),
-              ],
             ),
           ],
         ),
@@ -383,10 +444,16 @@ class _HistoryPageState extends State<HistoryPage> {
 }
 
 class _ChartPainter extends CustomPainter {
+  final List<double> data;
+  final Color color;
+  _ChartPainter({required this.data, required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
+    if (data.isEmpty) return;
+
     final paint = Paint()
-      ..color = GoXeyColors.radicalRed
+      ..color = color
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -395,44 +462,55 @@ class _ChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [GoXeyColors.radicalRed.withOpacity(0.3), Colors.transparent],
+        colors: [color.withOpacity(0.3), Colors.transparent],
       ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
 
     final path = Path();
-    final points = [
-      Offset(0, size.height * 0.7),
-      Offset(size.width * 0.15, size.height * 0.5),
-      Offset(size.width * 0.3, size.height * 0.8),
-      Offset(size.width * 0.5, size.height * 0.2),
-      Offset(size.width * 0.7, size.height * 0.4),
-      Offset(size.width * 0.85, size.height * 0.1),
-      Offset(size.width, size.height * 0.3),
-    ];
+    
+    // Normalize data points
+    final maxVal = data.fold(0.0, (max, e) => e > max ? e : max);
+    final minVal = data.fold(maxVal, (min, e) => e < min ? e : min);
+    final range = maxVal - minVal == 0 ? 1.0 : maxVal - minVal;
 
-    path.moveTo(points[0].dx, points[0].dy);
-    for (int i = 1; i < points.length; i++) {
-      final p0 = points[i - 1];
-      final p1 = points[i];
-      final controlPoint1 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p0.dy);
-      final controlPoint2 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p1.dy);
-      path.cubicTo(controlPoint1.dx, controlPoint1.dy, controlPoint2.dx, controlPoint2.dy, p1.dx, p1.dy);
+    final List<Offset> points = [];
+    final stepX = size.width / (data.length > 1 ? data.length - 1 : 1);
+
+    for (int i = 0; i < data.length; i++) {
+      final x = i * stepX;
+      // Map value to height (inverted y)
+      final normalizedY = (data[i] - minVal) / range;
+      final y = size.height - (normalizedY * size.height * 0.8 + size.height * 0.1);
+      points.add(Offset(x, y));
     }
 
-    final fillPath = Path.from(path);
-    fillPath.lineTo(size.width, size.height);
-    fillPath.lineTo(0, size.height);
-    fillPath.close();
+    if (points.length == 1) {
+      canvas.drawCircle(points[0], 4, paint);
+    } else {
+      path.moveTo(points[0].dx, points[0].dy);
+      for (int i = 1; i < points.length; i++) {
+        final p0 = points[i - 1];
+        final p1 = points[i];
+        final controlPoint1 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p0.dy);
+        final controlPoint2 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p1.dy);
+        path.cubicTo(controlPoint1.dx, controlPoint1.dy, controlPoint2.dx, controlPoint2.dy, p1.dx, p1.dy);
+      }
 
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
+      final fillPath = Path.from(path);
+      fillPath.lineTo(size.width, size.height);
+      fillPath.lineTo(0, size.height);
+      fillPath.close();
 
-    final dotPaint = Paint()..color = Colors.white;
-    for (var p in points) {
-      canvas.drawCircle(p, 4, dotPaint);
-      canvas.drawCircle(p, 6, paint);
+      canvas.drawPath(fillPath, fillPaint);
+      canvas.drawPath(path, paint);
+
+      final dotPaint = Paint()..color = Colors.white;
+      for (var p in points) {
+        canvas.drawCircle(p, 4, dotPaint);
+        canvas.drawCircle(p, 6, paint);
+      }
     }
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

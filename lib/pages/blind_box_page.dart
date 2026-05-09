@@ -200,7 +200,9 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                         height: 300,
                                       )
                                     : Image.asset(
-                                        'assets/series/${widget.seriesName.toLowerCase().replaceAll(' ', '_')}.jpg',
+                                        widget.seriesName == "GX Series" 
+                                            ? 'assets/series/goxeyPage.png'
+                                            : 'assets/series/${widget.seriesName.toLowerCase().replaceAll(' ', '_')}.jpg',
                                         height: 300,
                                         errorBuilder: (context, error, stackTrace) => Icon(Icons.inventory_2, size: 200, color: Colors.white10),
                                       ),
