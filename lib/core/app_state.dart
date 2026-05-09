@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppState extends ChangeNotifier {
   bool _isGoxeyMode = false;
   double _totalBalance = 5000.00;
-  double _pocketsBalance = 0.00;
+  double _pocketsBalance = 2150.00;
   int _usedBoxesCount = 0;
   String _avatarUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
 
@@ -27,7 +27,12 @@ class AppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isGoxeyMode = prefs.getBool('isGoxeyMode') ?? false;
     _totalBalance = prefs.getDouble('totalBalance') ?? 5000.00;
-    _pocketsBalance = prefs.getDouble('pocketsBalance') ?? 0.00;
+    
+    _pocketsBalance = prefs.getDouble('pocketsBalance') ?? 2150.00;
+    if (_pocketsBalance == 0.00) {
+      _pocketsBalance = 2150.00; // Force to 2150 if it was saved as 0 from previous runs
+    }
+    
     _usedBoxesCount = prefs.getInt('usedBoxesCount') ?? 0;
     _avatarUrl = prefs.getString('avatarUrl') ?? "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
     notifyListeners();

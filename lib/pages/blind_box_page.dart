@@ -63,7 +63,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
           if (widget.seriesName == "Dimoo") {
             _revealedAvatarUrl = "assets/avatars/dimoo/dimoo_hidden.png";
           } else {
-            _revealedAvatarUrl = "assets/avatars/goxey/goxey_hidden.jpg";
+            _revealedAvatarUrl = "assets/series/gx_hidden.png";
           }
         } else {
           Map<String, List<String>> pools = {
@@ -74,15 +74,10 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
               "assets/avatars/dimoo/dimoo_new_4.png", 
             ],
             "GoXey Original": [
-              "assets/avatars/goxey/goxey_1.jpg",
-              "assets/avatars/goxey/goxey_2.jpg",
-              "assets/avatars/goxey/goxey_3.jpg",
-              "assets/avatars/goxey/goxey_4.jpg",
-              "assets/avatars/goxey/goxey_5.jpg",
-              "assets/avatars/goxey/goxey_6.jpg",
-              "assets/avatars/goxey/goxey_7.jpg",
-              "assets/avatars/goxey/goxey_8.jpg",
-              "assets/avatars/goxey/goxey_9.jpg",
+              "assets/series/gx_bot.png",
+              "assets/series/gx_kid.png",
+              "assets/series/gx_devil.png",
+              "assets/series/gx_hoodie.png",
             ],
           };
           List<String> pool = pools[widget.seriesName] ?? pools["Dimoo"]!;
