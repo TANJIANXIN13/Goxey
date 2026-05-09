@@ -136,22 +136,20 @@ class SquadPocketsPage extends StatelessWidget {
                 ),
               ],
             ),
-            if (members.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.people_outline, color: Colors.white54, size: 14),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      "Me, ${members.join(', ')}",
-                      style: const TextStyle(color: Colors.white60, fontSize: 12),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.people_outline, color: Colors.white54, size: 14),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    members.isEmpty ? "Me" : "Me, ${members.join(', ')}",
+                    style: const TextStyle(color: Colors.white60, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -276,7 +274,7 @@ class SquadPocketsPage extends StatelessWidget {
                 const Text("Invite Members", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 // Pre-existing friends list
-                ...["Liam – 1029384756 (Maybank)", "Chloe – 5647382910 (CIMB)", "Ethan – 9988776655 (Public Bank)"].map(
+                ...["Liam – 1029384756 (Maybank)", "Tom – 5647382910 (CIMB)", "Ethan – 9988776655 (Public Bank)"].map(
                   (friend) {
                     final name = friend.split(' ')[0];
                     final isSelected = selectedMembers.contains(name);
@@ -323,7 +321,7 @@ class SquadPocketsPage extends StatelessWidget {
                 final name = nameController.text.trim();
                 final target = double.tryParse(targetController.text) ?? 0;
                 if (name.isNotEmpty && target > 0) {
-                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, ["Me", ...selectedMembers]);
+                  Provider.of<PocketProvider>(context, listen: false).addPocket(name, target, selectedMembers);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("\"$name\" pocket created! 🚀"), backgroundColor: GoXeyColors.neonLime),
@@ -369,7 +367,7 @@ class SquadPocketsPage extends StatelessWidget {
                   shrinkWrap: true,
                   children: [
                     _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
-                    _buildFriendItem(context, "Chloe", "5647382910 (CIMB)"),
+                    _buildFriendItem(context, "Tom", "5647382910 (CIMB)"),
                     _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
                   ],
                 ),

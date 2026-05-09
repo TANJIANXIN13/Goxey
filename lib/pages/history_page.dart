@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../core/app_state.dart';
 import 'package:animate_do/animate_do.dart';
+import 'dart:math' as math;
 
 class HistoryPage extends StatefulWidget {
   final bool isActive;
@@ -31,14 +32,13 @@ class _HistoryPageState extends State<HistoryPage> {
       context: context,
       barrierDismissible: true,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF090D16), // Dark blue that seems like black
+        backgroundColor: const Color(0xFF090D16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         contentPadding: const EdgeInsets.all(28),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Upper part
             const Text(
               "Today...",
               style: TextStyle(
@@ -49,7 +49,6 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Middle part
             const Text(
               "Congratulations, today you paid RM18.50 for a cup of sugary coffee and a misspelled name. ☕",
               style: TextStyle(
@@ -60,7 +59,6 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             const SizedBox(height: 32),
-            // 100% Stacked Bar Chart
             Container(
               height: 16,
               width: double.infinity,
@@ -71,28 +69,15 @@ class _HistoryPageState extends State<HistoryPage> {
                 borderRadius: BorderRadius.circular(8),
                 child: Row(
                   children: [
-                    Expanded(
-                      flex: 15,
-                      child: Container(color: GoXeyColors.neonLime),
-                    ),
-                    Expanded(
-                      flex: 50,
-                      child: Container(color: Colors.cyanAccent),
-                    ),
-                    Expanded(
-                      flex: 13,
-                      child: Container(color: Colors.yellowAccent),
-                    ),
-                    Expanded(
-                      flex: 22,
-                      child: Container(color: Colors.orangeAccent),
-                    ),
+                    Expanded(flex: 15, child: Container(color: GoXeyColors.neonLime)),
+                    Expanded(flex: 50, child: Container(color: Colors.cyanAccent)),
+                    Expanded(flex: 13, child: Container(color: Colors.yellowAccent)),
+                    Expanded(flex: 22, child: Container(color: Colors.orangeAccent)),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            // Legends under the bar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -103,7 +88,6 @@ class _HistoryPageState extends State<HistoryPage> {
               ],
             ),
             const SizedBox(height: 32),
-            // Got It button
             GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
@@ -123,11 +107,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: const Center(
                   child: Text(
                     "Got it",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -143,27 +123,14 @@ class _HistoryPageState extends State<HistoryPage> {
       children: [
         Row(
           children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-            ),
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 4),
             Icon(icon, color: Colors.white38, size: 14),
           ],
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          percentage,
-          style: const TextStyle(color: Colors.white70, fontSize: 10),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold)),
+        Text(percentage, style: const TextStyle(color: Colors.white70, fontSize: 10)),
       ],
     );
   }
@@ -190,9 +157,7 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           const SizedBox(height: 32),
           if (isGoxey) ...[
-            _buildBeautifiedChart(),
-            const SizedBox(height: 20),
-            _buildSavingsChart(appState),
+            _buildSpendingPieChart(appState),
             const SizedBox(height: 40),
             const Text(
               "Recent Transactions",
@@ -209,118 +174,104 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _buildBeautifiedChart() {
-    return Consumer<AppState>(
-      builder: (context, appState, child) {
-        final transactions = appState.transactions;
-        // Filter only negative transactions (spending)
-        final spends = transactions
-            .where((tx) => (tx["amount"] as double) < 0)
-            .map((tx) => (tx["amount"] as double).abs())
-            .toList();
-        
-        final totalSpend = spends.fold(0.0, (sum, item) => sum + item);
-
-        return FadeInDown(
-          child: Container(
-            height: 220,
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: GoXeyColors.radicalRed.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: GoXeyColors.radicalRed.withOpacity(0.2)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Recent Spending", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                        Text("RM ${totalSpend.toStringAsFixed(2)}", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: GoXeyColors.radicalRed.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text("SPEND", style: TextStyle(color: GoXeyColors.radicalRed, fontSize: 10, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                SizedBox(
-                  height: 80,
-                  width: double.infinity,
-                  child: CustomPaint(
-                    painter: _ChartPainter(data: spends.reversed.toList(), color: GoXeyColors.radicalRed),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSavingsChart(AppState appState) {
+  Widget _buildSpendingPieChart(AppState appState) {
     final transactions = appState.transactions;
-    // Filter only positive transactions (savings/income)
-    final savings = transactions
-        .where((tx) => (tx["amount"] as double) >= 0)
-        .map((tx) => (tx["amount"] as double))
-        .toList();
-    
-    final totalSaved = savings.fold(0.0, (sum, item) => sum + item);
+    final Map<String, double> categories = {};
+    double totalSpend = 0;
+
+    for (var tx in transactions) {
+      final amount = tx["amount"] as double;
+      if (amount < 0) {
+        final category = tx["category"] as String;
+        final absAmount = amount.abs();
+        categories[category] = (categories[category] ?? 0) + absAmount;
+        totalSpend += absAmount;
+      }
+    }
+
+    if (totalSpend == 0) return const SizedBox();
+
+    final List<Color> sliceColors = [
+      GoXeyColors.neonLime,
+      Colors.cyanAccent,
+      Colors.yellowAccent,
+      Colors.orangeAccent,
+      GoXeyColors.radicalRed,
+    ];
 
     return FadeInDown(
-      delay: const Duration(milliseconds: 200),
       child: Container(
-        height: 220,
-        width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: GoXeyColors.neonLime.withOpacity(0.05),
+          color: Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.2)),
+          border: Border.all(color: Colors.white10),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              "SPENDING SUMMARY",
+              style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+            ),
+            const SizedBox(height: 24),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Recent Savings", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    Text("RM ${totalSaved.toStringAsFixed(2)}", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: GoXeyColors.neonLime.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
+                SizedBox(
+                  height: 140,
+                  width: 140,
+                  child: CustomPaint(
+                    painter: _PieChartPainter(
+                      data: categories.values.toList(),
+                      colors: sliceColors,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("TOTAL", style: TextStyle(color: Colors.white38, fontSize: 8)),
+                          Text(
+                            "RM${totalSpend.toStringAsFixed(0)}",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: const Text("SAVE", style: TextStyle(color: GoXeyColors.neonLime, fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 32),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: categories.keys.toList().asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final cat = entry.value;
+                      final amount = categories[cat]!;
+                      final percentage = (amount / totalSpend * 100).toStringAsFixed(0);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(color: sliceColors[i % sliceColors.length], shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                cat,
+                                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text("$percentage%", style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ],
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 80,
-              width: double.infinity,
-              child: CustomPaint(
-                painter: _ChartPainter(data: savings.reversed.toList(), color: GoXeyColors.neonLime),
-              ),
             ),
           ],
         ),
@@ -443,74 +394,38 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-class _ChartPainter extends CustomPainter {
+class _PieChartPainter extends CustomPainter {
   final List<double> data;
-  final Color color;
-  _ChartPainter({required this.data, required this.color});
+  final List<Color> colors;
+
+  _PieChartPainter({required this.data, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (data.isEmpty) return;
+    final double total = data.fold(0, (sum, item) => sum + item);
+    double startAngle = -math.pi / 2;
 
     final paint = Paint()
-      ..color = color
-      ..strokeWidth = 3
       ..style = PaintingStyle.stroke
+      ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
 
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [color.withOpacity(0.3), Colors.transparent],
-      ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
-
-    final path = Path();
-    
-    // Normalize data points
-    final maxVal = data.fold(0.0, (max, e) => e > max ? e : max);
-    final minVal = data.fold(maxVal, (min, e) => e < min ? e : min);
-    final range = maxVal - minVal == 0 ? 1.0 : maxVal - minVal;
-
-    final List<Offset> points = [];
-    final stepX = size.width / (data.length > 1 ? data.length - 1 : 1);
+    final rect = Rect.fromCircle(
+      center: Offset(size.width / 2, size.height / 2),
+      radius: size.width / 2 - 6,
+    );
 
     for (int i = 0; i < data.length; i++) {
-      final x = i * stepX;
-      // Map value to height (inverted y)
-      final normalizedY = (data[i] - minVal) / range;
-      final y = size.height - (normalizedY * size.height * 0.8 + size.height * 0.1);
-      points.add(Offset(x, y));
-    }
-
-    if (points.length == 1) {
-      canvas.drawCircle(points[0], 4, paint);
-    } else {
-      path.moveTo(points[0].dx, points[0].dy);
-      for (int i = 1; i < points.length; i++) {
-        final p0 = points[i - 1];
-        final p1 = points[i];
-        final controlPoint1 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p0.dy);
-        final controlPoint2 = Offset(p0.dx + (p1.dx - p0.dx) / 2, p1.dy);
-        path.cubicTo(controlPoint1.dx, controlPoint1.dy, controlPoint2.dx, controlPoint2.dy, p1.dx, p1.dy);
-      }
-
-      final fillPath = Path.from(path);
-      fillPath.lineTo(size.width, size.height);
-      fillPath.lineTo(0, size.height);
-      fillPath.close();
-
-      canvas.drawPath(fillPath, fillPaint);
-      canvas.drawPath(path, paint);
-
-      final dotPaint = Paint()..color = Colors.white;
-      for (var p in points) {
-        canvas.drawCircle(p, 4, dotPaint);
-        canvas.drawCircle(p, 6, paint);
-      }
+      final sweepAngle = (data[i] / total) * 2 * math.pi;
+      paint.color = colors[i % colors.length];
+      
+      // Draw arc with a small gap
+      canvas.drawArc(rect, startAngle + 0.05, sweepAngle - 0.1, false, paint);
+      
+      startAngle += sweepAngle;
     }
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

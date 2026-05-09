@@ -41,7 +41,7 @@ class PocketProvider extends ChangeNotifier {
       name: "Langkawi Trip Fund",
       target: 5000,
       saved: 2150,
-      members: ["Liam", "Chloe", "Ethan"],
+      members: ["Liam", "Tom", "Ethan"],
       activities: [
         PocketActivity(
           name: "Liam",
@@ -50,7 +50,7 @@ class PocketProvider extends ChangeNotifier {
           time: "2 hours ago",
         ),
         PocketActivity(
-          name: "Chloe",
+          name: "Tom",
           content: "Just opened a DIMOO box and got the DIMOO series! 🌟",
           time: "5 hours ago",
           isBoxUpdate: true,
@@ -60,9 +60,18 @@ class PocketProvider extends ChangeNotifier {
     ),
   ];
 
-  List<Pocket> get pockets => List.unmodifiable(_pockets);
+  final Map<String, List<String>> _userOwnedCollections = {
+    "DIMOO": ["dimoo_new_1.png", "dimoo_new_3.png"],
+    "CRYBABY SERIES": ["crybaby1.webp", "crybaby2.webp", "crybaby5.webp"],
+    "SKULLPANDA": ["skullpanda2.webp", "skullpanda5.webp"],
+    "TWINKLE TWINKLE": ["twinkle twinkle 1.webp", "twinkle twinkle 4.webp"],
+    "MOLLY": ["molly1.webp", "molly5.webp"],
+    "GX SERIES": ["gx1.png", "gx2.png"],
+  };
 
+  List<Pocket> get pockets => List.unmodifiable(_pockets);
   double get totalSaved => _pockets.fold(0, (sum, p) => sum + p.saved);
+  Map<String, List<String>> get userOwnedCollections => _userOwnedCollections;
 
   void addPocket(String name, double target, List<String> members) {
     _pockets.add(Pocket(name: name, target: target, members: members));
@@ -89,14 +98,52 @@ class PocketProvider extends ChangeNotifier {
     }
   }
 
-  void recordBlindBoxOpen(String seriesName, String imagePath) {
-    _pullCounts[seriesName] = (_pullCounts[seriesName] ?? 0) + 1;
+  void recordBlindBoxOpen(String seriesName, String imagePath, {bool isUpdate = false}) {
+    if (!isUpdate) {
+      _pullCounts[seriesName] = (_pullCounts[seriesName] ?? 0) + 1;
+    }
+    
+    // Add to user collection
+    final normalizedSeriesName = seriesName.toUpperCase();
+    final parts = imagePath.split('/');
+    String fileName = parts.last;
+    if (parts.length >= 2 && parts[parts.length - 2] == 'custom') {
+      fileName = 'custom/$fileName';
+    }
+    
+    // Find matching key or create new one
+    String key = normalizedSeriesName;
+    if (key == "DIMOO") key = "DIMOO";
+    else if (key == "GX SERIES") key = "GX SERIES";
+    else if (key.contains("MOLLY")) key = "MOLLY";
+    else if (key.contains("CRYBABY")) key = "CRYBABY SERIES";
+    else if (key.contains("SKULLPANDA")) key = "SKULLPANDA";
+    
+    if (!_userOwnedCollections.containsKey(key)) {
+      _userOwnedCollections[key] = [];
+    }
+    
+    if (isUpdate && _userOwnedCollections[key]!.isNotEmpty) {
+      // Replace the last one if it's an update (e.g. customized hidden)
+      _userOwnedCollections[key]!.removeLast();
+    }
+
+    if (!_userOwnedCollections[key]!.contains(fileName)) {
+      _userOwnedCollections[key]!.add(fileName);
+    }
+
     for (var i = 0; i < _pockets.length; i++) {
+      if (isUpdate && _pockets[i].activities.isNotEmpty && _pockets[i].activities.first.isBoxUpdate) {
+        _pockets[i].activities.removeAt(0);
+      }
+      
       _pockets[i].activities.insert(
         0,
         PocketActivity(
           name: "Me",
-          content: "Just opened a $seriesName box and got a new figure! 🌟",
+          content: isUpdate 
+            ? "Just customized my $seriesName figure! ✨" 
+            : "Just opened a $seriesName box and got a new figure! 🌟",
           time: "Just Now",
           isBoxUpdate: true,
           boxImage: imagePath,

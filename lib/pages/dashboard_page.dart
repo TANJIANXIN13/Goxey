@@ -195,6 +195,16 @@ class _DashboardPageState extends State<DashboardPage> {
                 appState.transferToPockets(amount);
                 pocketProvider.addMoneyToPocket(pocket, amount);
                 Navigator.pop(context);
+
+                // Check for RM 10,000 Milestone
+                final milestone = (appState.pocketsBalance ~/ 10000).toInt() * 10000;
+                if (milestone >= 10000 && milestone > appState.lastRedeemedMilestone) {
+                  appState.markRedemptionTriggered(milestone);
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    _showRedemptionDialog(milestone);
+                  });
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -222,6 +232,280 @@ class _DashboardPageState extends State<DashboardPage> {
             child: const Text("Confirm"),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showRedemptionDialog(int milestone) {
+    final pocketProvider = Provider.of<PocketProvider>(context, listen: false);
+    final collections = pocketProvider.userOwnedCollections;
+    final List<Map<String, String>> flattenedFigurines = [];
+    
+    collections.forEach((series, files) {
+      String folder = "";
+      if (series.contains("DIMOO")) folder = "dimoo";
+      else if (series.contains("TWINKLE")) folder = "twinkle";
+      else if (series.contains("SKULLPANDA")) folder = "skullpanda";
+      else if (series.contains("CRYBABY")) folder = "crybaby";
+      else if (series.contains("MOLLY")) folder = "molly";
+      else if (series.contains("GX")) folder = "goxey";
+
+      for (var file in files) {
+        flattenedFigurines.add({
+          "path": folder == "goxey" ? "assets/avatars/goxey/$file" : "assets/avatars/$folder/$file",
+          "name": "$series Collection",
+        });
+      }
+    });
+
+    int currentStep = 0; // 0: Congrats, 1: Select Figure, 2: Method, 3: Form, 4: Done
+    String? selectedFigurine;
+    String? selectedMethod;
+    
+    final nameController = TextEditingController();
+    final phoneController = TextEditingController();
+    final addressController = TextEditingController();
+
+    final List<String> popMartStores = [
+      "Pavilion Kuala Lumpur",
+      "Sunway Pyramid",
+      "One Utama",
+      "Genting SkyAvenue",
+      "Mid Valley Megamall",
+    ];
+    String? selectedStore;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          Widget content = const SizedBox();
+          String title = "MILESTONE REACHED!";
+
+          if (currentStep == 0) {
+            content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FadeInDown(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: GoXeyColors.neonLime.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.stars, color: GoXeyColors.neonLime, size: 64),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "RM ${milestone.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} SAVED!",
+                  style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Incredible! You've reached a massive saving milestone. As a reward, you can redeem a PHYSICAL blind box from the Pop Mart store!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70, height: 1.5),
+                ),
+              ],
+            );
+          } else if (currentStep == 1) {
+            title = "CHOOSE YOUR FIGURE";
+            content = SizedBox(
+              height: 250,
+              width: double.maxFinite,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: flattenedFigurines.length,
+                itemBuilder: (context, i) {
+                  final item = flattenedFigurines[i];
+                  final isSelected = selectedFigurine == item['path'];
+                  return GestureDetector(
+                    onTap: () => setDialogState(() => selectedFigurine = item['path']),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isSelected ? GoXeyColors.neonLime.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isSelected ? GoXeyColors.neonLime : Colors.white10),
+                      ),
+                      child: Center(
+                        child: Image.asset(item['path']!, height: 50),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          } else if (currentStep == 2) {
+            title = "RECEIPT METHOD";
+            content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildMethodOption(
+                  icon: Icons.store,
+                  title: "Self Pickup",
+                  subtitle: "At any physical Pop Mart store",
+                  isSelected: selectedMethod == "pickup",
+                  onTap: () => setDialogState(() => selectedMethod = "pickup"),
+                ),
+                const SizedBox(height: 12),
+                _buildMethodOption(
+                  icon: Icons.local_shipping,
+                  title: "Home Delivery",
+                  subtitle: "Delivered to your doorstep",
+                  isSelected: selectedMethod == "delivery",
+                  onTap: () => setDialogState(() => selectedMethod = "delivery"),
+                ),
+              ],
+            );
+          } else if (currentStep == 3) {
+            title = "PICKUP LOCATION";
+            content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: popMartStores.map((store) {
+                final isSelected = selectedStore == store;
+                return GestureDetector(
+                  onTap: () => setDialogState(() => selectedStore = store),
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isSelected ? GoXeyColors.neonLime.withOpacity(0.1) : Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isSelected ? GoXeyColors.neonLime : Colors.white10),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_on, color: isSelected ? GoXeyColors.neonLime : Colors.white38, size: 18),
+                        const SizedBox(width: 12),
+                        Text(store, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          } else if (currentStep == 4) {
+            title = "DELIVERY DETAILS";
+            content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildTextField(nameController, "Full Name", Icons.person),
+                const SizedBox(height: 12),
+                _buildTextField(phoneController, "Phone Number", Icons.phone),
+                const SizedBox(height: 12),
+                _buildTextField(addressController, "Shipping Address", Icons.home, maxLines: 3),
+              ],
+            );
+          } else if (currentStep == 5) {
+            title = "REDEMPTION SUCCESS!";
+            content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: GoXeyColors.neonLime, size: 64),
+                const SizedBox(height: 24),
+                Text(
+                  selectedMethod == "pickup" 
+                    ? "Great! Head to Pop Mart @ $selectedStore and show this screen to pick up your figure."
+                    : "Your figure is being packed! We will deliver it to your address soon.",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              ],
+            );
+          }
+
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            content: content,
+            actions: [
+              if (currentStep < 5)
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+                ),
+              ElevatedButton(
+                onPressed: () {
+                  if (currentStep == 0) {
+                    setDialogState(() => currentStep = 1);
+                  } else if (currentStep == 1) {
+                    if (selectedFigurine != null) setDialogState(() => currentStep = 2);
+                  } else if (currentStep == 2) {
+                    if (selectedMethod == "pickup") setDialogState(() => currentStep = 3);
+                    else if (selectedMethod == "delivery") setDialogState(() => currentStep = 4);
+                  } else if (currentStep == 3) {
+                    if (selectedStore != null) setDialogState(() => currentStep = 5);
+                  } else if (currentStep == 4) {
+                    if (nameController.text.isNotEmpty && phoneController.text.isNotEmpty && addressController.text.isNotEmpty) {
+                      setDialogState(() => currentStep = 5);
+                    }
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: GoXeyColors.neonLime,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(currentStep == 5 ? "Done" : "Next"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMethodOption({required IconData icon, required String title, required String subtitle, required bool isSelected, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? GoXeyColors.neonLime.withOpacity(0.1) : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isSelected ? GoXeyColors.neonLime : Colors.white10),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: isSelected ? GoXeyColors.neonLime : Colors.white38),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, {int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+        prefixIcon: Icon(icon, color: Colors.white38, size: 20),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
       ),
     );
   }
@@ -732,29 +1016,27 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
             ],
-            if (members.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.people_outline,
-                    color: Colors.white38,
-                    size: 13,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      "Me, ${members.join(', ')}",
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 11,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(
+                  Icons.people_outline,
+                  color: Colors.white38,
+                  size: 13,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    members.isEmpty ? "Me" : "Me, ${members.join(', ')}",
+                    style: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: 11,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
             const Spacer(),
             if (title == "Main Account")
               const Text(

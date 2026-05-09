@@ -6,6 +6,7 @@ import '../core/app_state.dart';
 import '../core/budget_provider.dart';
 import 'avatar_creator_page.dart';
 import 'package:animate_do/animate_do.dart';
+import '../core/pocket_provider.dart';
 
 class MePage extends StatelessWidget {
   const MePage({super.key});
@@ -85,7 +86,11 @@ class MePage extends StatelessWidget {
                 "Banking Details",
               ),
               _buildProfileOption(Icons.security, "Security & Privacy"),
-              _buildProfileOption(Icons.card_giftcard, "Blind Box Collection"),
+              _buildProfileOption(
+                Icons.card_giftcard, 
+                "Blind Box Collection", 
+                onTap: () => _showCollectionDialog(context)
+              ),
               _buildProfileOption(Icons.account_balance, "Budget & Debt Settings", onTap: () => _showBudgetSettings(context)),
               const SizedBox(height: 40),
               TextButton(
@@ -129,6 +134,102 @@ class MePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showCollectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer<PocketProvider>(
+          builder: (context, pocketProvider, child) {
+            final collections = pocketProvider.userOwnedCollections;
+            final List<String> seriesKeys = collections.keys.toList();
+
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1A1A1A),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: const Text(
+                "MY COLLECTION",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: seriesKeys.isEmpty
+                    ? const Center(
+                        child: Text("No items collected yet", style: TextStyle(color: Colors.white24)),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: seriesKeys.length,
+                        itemBuilder: (context, index) {
+                          final seriesName = seriesKeys[index];
+                          final figurines = collections[seriesName]!;
+                          
+                          String folder = "";
+                          if (seriesName.contains("DIMOO")) folder = "dimoo";
+                          else if (seriesName.contains("TWINKLE")) folder = "twinkle";
+                          else if (seriesName.contains("SKULLPANDA")) folder = "skullpanda";
+                          else if (seriesName.contains("CRYBABY")) folder = "crybaby";
+                          else if (seriesName.contains("MOLLY")) folder = "molly";
+                          else if (seriesName.contains("GX")) folder = "goxey";
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  seriesName,
+                                  style: const TextStyle(
+                                    color: GoXeyColors.neonLime,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 70,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: figurines.length,
+                                  itemBuilder: (context, fIdx) {
+                                    final fileName = figurines[fIdx];
+                                    final path = folder == "goxey" 
+                                        ? "assets/avatars/goxey/$fileName" 
+                                        : "assets/avatars/$folder/$fileName";
+                                    return Container(
+                                      width: 60,
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.05),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.white10),
+                                      ),
+                                      child: Center(
+                                        child: Image.asset(path, height: 45),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const Divider(color: Colors.white10, height: 24),
+                            ],
+                          );
+                        },
+                      ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Close", style: TextStyle(color: Colors.white38)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

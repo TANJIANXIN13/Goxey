@@ -55,7 +55,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       },
     },
     {
-      "name": "Chloe",
+      "name": "Tom",
       "avatar": "assets/avatars/avatar_5.jpg",
       "description": "Dimoo figure as avatar",
       "isMe": false,
@@ -91,7 +91,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
   double _getContribution(String memberName, Pocket pocket) {
     if (pocket.name.contains("Langkawi")) {
       if (memberName == "Liam") return 800;
-      if (memberName == "Chloe") return 550;
+      if (memberName == "Tom") return 550;
       if (memberName == "Ethan") return 450;
       if (memberName == "Me") return (pocket.saved - 1800).clamp(0.0, 9999.0);
     }
@@ -100,11 +100,8 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // If it's a legacy pocket, include everyone. If it's a NEW pocket, use the members list.
-    // Note: PocketProvider now prepends "Me" to new pockets.
-    final List<String> activeMemberNames = widget.pocket.name.contains("Langkawi") 
-        ? ["Me", "Liam", "Chloe", "Ethan"]
-        : widget.pocket.members;
+    // Always include "Me" as the first member of any pocket
+    final List<String> activeMemberNames = ["Me", ...widget.pocket.members];
 
     if (activeMemberNames.isEmpty) {
       return Scaffold(
@@ -114,11 +111,17 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       );
     }
 
+    final pocketProvider = Provider.of<PocketProvider>(context);
     final currentMemberName = activeMemberNames[_currentCollectionIndex % activeMemberNames.length];
-    final currentMember = _squadMembersData.firstWhere(
+    final Map<String, dynamic> baseMember = _squadMembersData.firstWhere(
       (m) => m['name'] == currentMemberName, 
       orElse: () => _squadMembersData[0]
     );
+    
+    // Inject dynamic collection for "Me"
+    final currentMember = currentMemberName == "Me" 
+        ? {...baseMember, 'ownedCollections': pocketProvider.userOwnedCollections}
+        : baseMember;
     final bool isGhost = currentMember['status'] == "GHOST";
     final bool isMe = currentMemberName == "Me";
 

@@ -17,6 +17,8 @@ class AppState extends ChangeNotifier {
     {"name": "Uniqlo", "category": "Shopping", "amount": -89.00, "icon": Icons.shopping_bag, "color": Colors.orangeAccent, "date": "2 days ago"},
   ];
 
+  int _lastRedeemedMilestone = 0;
+
   bool get isGoxeyMode => _isGoxeyMode;
   double get totalBalance => _totalBalance;
   double get pocketsBalance => _pocketsBalance;
@@ -26,10 +28,16 @@ class AppState extends ChangeNotifier {
       _avatarUrl !=
       "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
   int get usedBoxesCount => _usedBoxesCount;
+  int get lastRedeemedMilestone => _lastRedeemedMilestone;
 
   // Every RM 200 gives 1 box
   int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;
   double get progressToNextBox => (_pocketsBalance % 200) / 200;
+
+  void markRedemptionTriggered(int milestone) {
+    _lastRedeemedMilestone = milestone;
+    notifyListeners();
+  }
 
   AppState() {
     _loadState();

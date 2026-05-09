@@ -103,12 +103,10 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
 
       await appState.openBlindBox(); 
       
-      if (!_isHidden) {
-        Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
-          widget.seriesName, 
-          _revealedAvatarUrl
-        );
-      }
+      Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+        widget.seriesName, 
+        _revealedAvatarUrl,
+      );
       setState(() => _isRevealed = true);
     }
   }
@@ -119,7 +117,11 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
       _revealedAvatarUrl = pool[_customIndex];
       _isCustomizing = false;
     });
-    // We don't pop immediately, allow sharing or saving
+    Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
+      widget.seriesName, 
+      _revealedAvatarUrl,
+      isUpdate: true,
+    );
   }
 
   void _showShareSheet() {
@@ -491,10 +493,6 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                               Expanded(
                                                 child: OutlinedButton(
                                                   onPressed: () {
-                                                    Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
-                                                      widget.seriesName, 
-                                                      _revealedAvatarUrl
-                                                    );
                                                     Navigator.pop(context);
                                                   },
                                                   style: OutlinedButton.styleFrom(
@@ -510,12 +508,6 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
                                                 Expanded(
                                                   child: ElevatedButton(
                                                     onPressed: () {
-                                                      if (_isHidden) {
-                                                        Provider.of<PocketProvider>(context, listen: false).recordBlindBoxOpen(
-                                                          widget.seriesName, 
-                                                          _revealedAvatarUrl
-                                                        );
-                                                      }
                                                       setState(() { 
                                                         _isOpened = false; 
                                                         _isRevealed = false; 
