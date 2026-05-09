@@ -95,6 +95,13 @@ class _DashboardPageState extends State<DashboardPage> {
               final amount = double.tryParse(amountController.text) ?? 0;
               if (amount > 0) {
                 appState.addMoneyToMainAccount(amount);
+                appState.addTransaction(
+                  name: "Money Added",
+                  category: "Top-up",
+                  amount: amount,
+                  icon: Icons.add_card,
+                  color: GoXeyColors.neonLime,
+                );
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -186,6 +193,13 @@ class _DashboardPageState extends State<DashboardPage> {
               if (amount > 0 && amount <= appState.totalBalance) {
                 appState.transferToPockets(amount);
                 pocketProvider.addMoneyToPocket(pocket, amount);
+                appState.addTransaction(
+                  name: "Saved to ${pocket.name}",
+                  category: "Savings",
+                  amount: -amount,
+                  icon: Icons.savings_outlined,
+                  color: GoXeyColors.gxCyan,
+                );
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -257,6 +271,14 @@ class _DashboardPageState extends State<DashboardPage> {
               isWant: true,
               label: "CONFIRM RM 400.00",
               onSuccess: () {
+                final appState = Provider.of<AppState>(context, listen: false);
+                appState.addTransaction(
+                  name: "QR Payment",
+                  category: "Spend",
+                  amount: -400.00,
+                  icon: Icons.qr_code_scanner,
+                  color: GoXeyColors.radicalRed,
+                );
                 Navigator.pop(context);
                 SpendVisualizer.show(
                   context,
@@ -316,7 +338,7 @@ class _DashboardPageState extends State<DashboardPage> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(isGoxey),
+              _buildHeader(isGoxey, appState),
               Expanded(
                 child: IndexedStack(
                   index: _currentIndex,
@@ -375,7 +397,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildHeader(bool isGoxey) {
+  Widget _buildHeader(bool isGoxey, AppState appState) {
     String title = "Home";
     if (_currentIndex == 1) title = isGoxey ? "History" : "Rewards";
     if (_currentIndex == 2) title = isGoxey ? "Squad" : "Discover";
@@ -402,6 +424,25 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 4),
               Row(
                 children: [
+                  if (_currentIndex != 3) ...[
+                    GestureDetector(
+                      onTap: () => setState(() => _currentIndex = 3),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white24, width: 2),
+                        ),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.white10,
+                          backgroundImage: appState.avatarUrl.startsWith('http')
+                              ? NetworkImage(appState.avatarUrl)
+                              : AssetImage(appState.avatarUrl) as ImageProvider,
+                        ),
+                      ),
+                    ),
+                  ],
                   Text(
                     "USER",
                     style: const TextStyle(

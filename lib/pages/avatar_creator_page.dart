@@ -23,6 +23,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
 
   // 10 unique avatars from your collection
   final List<String> _avatarOptions = [
+    "assets/avatars/AvatarYX.jpg",
     "assets/avatars/avatar_1.jpg",
     "assets/avatars/avatar_2.jpg",
     "assets/avatars/avatar_3.jpg",
@@ -87,12 +88,11 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
-      final randomIndex = (DateTime.now().millisecond % _avatarOptions.length);
       setState(() {
         _isProcessing = false;
         _showSelection = true;
-        _selectedAvatarIndex = randomIndex;
-        _currentPage = (_infiniteCount ~/ 2) + randomIndex;
+        _selectedAvatarIndex = 0; // Default to AvatarYX.jpg
+        _currentPage = (_infiniteCount ~/ 2); // Center on the default avatar
         
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_pageController.hasClients) {
@@ -197,10 +197,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
               },
             ),
             child: PageView.builder(
-              controller: PageController(
-                viewportFraction: 0.8,
-                initialPage: _currentPage,
-              ),
+              controller: _pageController,
               itemCount: _infiniteCount,
               onPageChanged: (index) {
                 setState(() {

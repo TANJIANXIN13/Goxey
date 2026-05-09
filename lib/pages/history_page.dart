@@ -268,61 +268,62 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildTransactionList() {
-    final transactions = [
-      {"name": "Starbucks Coffee", "category": "Food & Drink", "amount": "-RM 18.50", "icon": Icons.local_cafe, "color": Colors.greenAccent},
-      {"name": "Steam Purchase", "category": "Gaming", "amount": "-RM 120.00", "icon": Icons.games, "color": Colors.cyanAccent},
-      {"name": "Grab Ride", "category": "Transport", "amount": "-RM 15.00", "icon": Icons.directions_car, "color": Colors.yellowAccent},
-      {"name": "Monthly Salary", "category": "Income", "amount": "+RM 5,500.00", "icon": Icons.account_balance_wallet, "color": Colors.pinkAccent},
-      {"name": "Uniqlo", "category": "Shopping", "amount": "-RM 89.00", "icon": Icons.shopping_bag, "color": Colors.orangeAccent},
-    ];
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: transactions.length,
-      itemBuilder: (context, index) {
-        final tx = transactions[index];
-        return FadeInUp(
-          delay: Duration(milliseconds: 100 * index),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: (tx["color"] as Color).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(tx["icon"] as IconData, color: tx["color"] as Color, size: 20),
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        final transactions = appState.transactions;
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: transactions.length,
+          itemBuilder: (context, index) {
+            final tx = transactions[index];
+            final amountStr = tx["amount"] >= 0 
+                ? "+RM ${tx["amount"].toStringAsFixed(2)}" 
+                : "-RM ${tx["amount"].abs().toStringAsFixed(2)}";
+            
+            return FadeInUp(
+              delay: Duration(milliseconds: 50 * index),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.05)),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(tx["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Text(tx["category"] as String, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: (tx["color"] as Color).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(tx["icon"] as IconData, color: tx["color"] as Color, size: 20),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(tx["name"] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          Text("${tx["category"]} • ${tx["date"]}", style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      amountStr,
+                      style: TextStyle(
+                        color: tx["amount"] >= 0 ? Colors.greenAccent : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  tx["amount"] as String,
-                  style: TextStyle(
-                    color: (tx["amount"] as String).startsWith("+") ? Colors.greenAccent : Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
