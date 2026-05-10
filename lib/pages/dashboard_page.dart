@@ -192,16 +192,20 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: () {
               final amount = double.tryParse(amountController.text) ?? 0;
               if (amount > 0 && amount <= appState.totalBalance) {
+                final oldBalance = appState.pocketsBalance;
                 appState.transferToPockets(amount);
                 pocketProvider.addMoneyToPocket(pocket, amount);
+                final newBalance = appState.pocketsBalance;
                 Navigator.pop(context);
 
                 // Check for RM 10,000 Milestone
-                final milestone = (appState.pocketsBalance ~/ 10000).toInt() * 10000;
-                if (milestone >= 10000 && milestone > appState.lastRedeemedMilestone) {
-                  appState.markRedemptionTriggered(milestone);
+                final oldMilestoneCount = (oldBalance ~/ 10000);
+                final newMilestoneCount = (newBalance ~/ 10000);
+                
+                if (newMilestoneCount > oldMilestoneCount) {
+                  // Only trigger if we cross a new 10k boundary
                   Future.delayed(const Duration(milliseconds: 500), () {
-                    _showRedemptionDialog(milestone);
+                    _showRedemptionDialog(amount);
                   });
                 }
 
@@ -236,8 +240,9 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  void _showRedemptionDialog(int milestone) {
+  void _showRedemptionDialog(double amount) {
     final pocketProvider = Provider.of<PocketProvider>(context, listen: false);
+    final appState = Provider.of<AppState>(context, listen: false);
     final collections = pocketProvider.userOwnedCollections;
     final List<Map<String, String>> flattenedFigurines = [];
     
@@ -299,7 +304,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  "RM ${milestone.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} SAVED!",
+                  "RM ${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} SAVED!",
                   style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
@@ -430,7 +435,7 @@ class _DashboardPageState extends State<DashboardPage> {
               if (currentStep < 5)
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel", style: TextStyle(color: Colors.white38)),
+                  child: Text(currentStep == 0 ? "Redeem Later" : "Cancel", style: const TextStyle(color: Colors.white38)),
                 ),
               ElevatedButton(
                 onPressed: () {
@@ -448,6 +453,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       setDialogState(() => currentStep = 5);
                     }
                   } else {
+                    appState.redeemPhysicalBox();
                     Navigator.pop(context);
                   }
                 },
@@ -1390,12 +1396,33 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                     isHighlight: availableBoxes > 0,
                   ),
+                  const SizedBox(height: 32),
+                  _buildPhysicalRedemptionSection(appState, totalSaved),
                 ],
               );
             },
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPhysicalRedemptionSection(AppState appState, double totalSaved) {
+    final available = appState.availablePhysicalBoxes;
+    
+    // Surprise! Hide the section if no redemptions are available
+    if (available == 0) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _buildAvatarAction(
+          "Redeem Physical Figure ($available)",
+          Icons.store,
+          () => _showRedemptionDialog(10000), // Default display for manual click
+          isHighlight: true,
+        ),
+      ],
     );
   }
 

@@ -18,6 +18,7 @@ class AppState extends ChangeNotifier {
   ];
 
   int _lastRedeemedMilestone = 0;
+  int _usedPhysicalBoxesCount = 0;
 
   bool get isGoxeyMode => _isGoxeyMode;
   double get totalBalance => _totalBalance;
@@ -29,14 +30,30 @@ class AppState extends ChangeNotifier {
       "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
   int get usedBoxesCount => _usedBoxesCount;
   int get lastRedeemedMilestone => _lastRedeemedMilestone;
+  int get usedPhysicalBoxesCount => _usedPhysicalBoxesCount;
 
   // Every RM 200 gives 1 box
   int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;
   double get progressToNextBox => (_pocketsBalance % 200) / 200;
 
+  // Physical boxes: every RM 10,000
+  int get availablePhysicalBoxes => (_pocketsBalance ~/ 10000) - _usedPhysicalBoxesCount;
+  double get progressToNextPhysicalBox => (_pocketsBalance % 10000) / 10000;
+
   void markRedemptionTriggered(int milestone) {
     _lastRedeemedMilestone = milestone;
     notifyListeners();
+  }
+
+  void redeemPhysicalBox() {
+    _usedPhysicalBoxesCount++;
+    _savePhysicalBoxCount();
+    notifyListeners();
+  }
+
+  Future<void> _savePhysicalBoxCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('usedPhysicalBoxesCount', _usedPhysicalBoxesCount);
   }
 
   AppState() {
@@ -50,6 +67,8 @@ class AppState extends ChangeNotifier {
 
     _pocketsBalance = 2150.00; // Force to initial state
     _usedBoxesCount = 10;     // Force to initial state
+    _usedPhysicalBoxesCount = prefs.getInt('usedPhysicalBoxesCount') ?? 0;
+    
     await prefs.setDouble('pocketsBalance', _pocketsBalance);
     await prefs.setInt('usedBoxesCount', _usedBoxesCount);
     _avatarUrl =
