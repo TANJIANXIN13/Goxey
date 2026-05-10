@@ -365,7 +365,6 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(member['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                Text(member['description'], style: const TextStyle(color: Colors.white38, fontSize: 10)),
               ],
             ),
           ),
