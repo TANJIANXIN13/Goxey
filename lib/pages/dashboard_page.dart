@@ -586,7 +586,14 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final pocketProvider = Provider.of<PocketProvider>(context);
     final isGoxey = appState.isGoxeyMode;
+
+    final initialTotal = 7150.0;
+    final currentTotal = pocketProvider.totalSaved + appState.totalBalance;
+    final totalSaved = currentTotal - initialTotal;
+    final totalTarget = 10000.0;
+    double percent = totalTarget == 0 ? 0 : (totalSaved / totalTarget) * 100;
 
     // Reset index to Home if switching to Original Mode while on a restricted tab
     if (!isGoxey && _currentIndex != 0) {
@@ -624,7 +631,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: IndexedStack(
                   index: _currentIndex,
                   children: [
-                    _buildHomeContent(isGoxey, appState),
+                    _buildHomeContent(isGoxey, appState, percent),
                     HistoryPage(isActive: _currentIndex == 1),
                     const SquadPocketsPage(),
                     const MePage(),
@@ -639,11 +646,34 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildHomeContent(bool isGoxey, AppState appState) {
+  BoxDecoration _getHomeGradient(double percent, bool isGoxey) {
+    if (!isGoxey) return const BoxDecoration();
+    
+    double p = percent.clamp(0.0, 50.0);
+    double gradientIntensity = 1.0 - (p / 50.0);
+    
+    if (gradientIntensity <= 0) return const BoxDecoration();
+
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          GoXeyColors.radicalRed.withOpacity(0.4 * gradientIntensity),
+          GoXeyColors.radicalRed.withOpacity(0.0),
+        ],
+        stops: [0.0, 0.5 * gradientIntensity],
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(bool isGoxey, AppState appState, double percent) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      child: Column(
-        children: [
+      child: Container(
+        decoration: _getHomeGradient(percent, isGoxey),
+        child: Column(
+          children: [
           _buildBalanceSection(isGoxey, appState.totalBalance),
           const SizedBox(height: 24),
           _buildQuickActions(isGoxey),
@@ -674,6 +704,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 40),
         ],
+      ),
       ),
     );
   }
