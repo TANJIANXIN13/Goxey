@@ -93,7 +93,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       if (memberName == "Liam") return 800;
       if (memberName == "Tom") return 550;
       if (memberName == "Ethan") return 450;
-      if (memberName == "Me") return (pocket.saved - 1800).clamp(0.0, 9999.0);
+      if (memberName == "Me") return (pocket.saved - 1800).clamp(0.0, double.infinity);
     }
     return memberName == "Me" ? pocket.saved : 0;
   }
@@ -112,11 +112,21 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
     }
 
     final pocketProvider = Provider.of<PocketProvider>(context);
+    final appState = Provider.of<AppState>(context);
     final currentMemberName = activeMemberNames[_currentCollectionIndex % activeMemberNames.length];
-    final Map<String, dynamic> baseMember = _squadMembersData.firstWhere(
+    Map<String, dynamic> baseMember = _squadMembersData.firstWhere(
       (m) => m['name'] == currentMemberName, 
       orElse: () => _squadMembersData[0]
     );
+
+    if (currentMemberName == "Me") {
+      baseMember = {
+        ...baseMember, 
+        'avatar': appState.hasCreatedAvatar 
+            ? appState.avatarUrl 
+            : "assets/avatars/goxey_placeholder.png"
+      };
+    }
     
 
     final currentMember = currentMemberName == "Me" 
@@ -212,7 +222,15 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
               itemCount: activeMemberNames.length,
               itemBuilder: (context, index) {
                 final name = activeMemberNames[index];
-                final member = _squadMembersData.firstWhere((m) => m['name'] == name, orElse: () => _squadMembersData[0]);
+                Map<String, dynamic> member = _squadMembersData.firstWhere((m) => m['name'] == name, orElse: () => _squadMembersData[0]);
+                if (name == "Me") {
+                  member = {
+                    ...member, 
+                    'avatar': appState.hasCreatedAvatar 
+                        ? appState.avatarUrl 
+                        : "assets/avatars/goxey_placeholder.png"
+                  };
+                }
                 final contribution = _getContribution(name, widget.pocket);
                 return _buildMemberTile(member, contribution);
               },
@@ -355,7 +373,9 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
               : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
             child: CircleAvatar(
               radius: 18,
-              backgroundImage: AssetImage(member['avatar']),
+              backgroundImage: member['avatar'].toString().startsWith('http')
+                  ? NetworkImage(member['avatar']) as ImageProvider
+                  : AssetImage(member['avatar']) as ImageProvider,
               backgroundColor: Colors.white10,
             ),
           ),

@@ -229,6 +229,51 @@ class SquadPocketsPage extends StatelessWidget {
     );
   }
 
+  void _showTopToast(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 80,
+        left: 40,
+        right: 40,
+        child: Material(
+          color: Colors.transparent,
+          child: FadeInDown(
+            duration: const Duration(milliseconds: 300),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: GoXeyColors.neonLime,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black54, blurRadius: 20, spreadRadius: 5)
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.black, size: 18),
+                    const SizedBox(width: 10),
+                    Text(
+                      message,
+                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(entry);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (entry.mounted) entry.remove();
+    });
+  }
+
   void _showCreatePocketDialog(BuildContext context) {
     final nameController = TextEditingController();
     final targetController = TextEditingController();
@@ -329,13 +374,7 @@ class SquadPocketsPage extends StatelessWidget {
                           icon: const Icon(Icons.copy, size: 18, color: Colors.white70),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: generatedLink!));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Link copied!"),
-                                backgroundColor: GoXeyColors.neonLime,
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
+                            _showTopToast(context, "Link copied!");
                           },
                         ),
                       ],

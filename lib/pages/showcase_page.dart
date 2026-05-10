@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/pocket_provider.dart';
+import '../core/app_state.dart';
 import '../core/theme.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -73,6 +74,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -98,14 +100,14 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildUpdatesSection(),
-          _buildCollectionSection(),
+          _buildUpdatesSection(appState),
+          _buildCollectionSection(appState),
         ],
       ),
     );
   }
 
-  Widget _buildUpdatesSection() {
+  Widget _buildUpdatesSection(AppState appState) {
     return Consumer<PocketProvider>(
       builder: (context, pocketProvider, child) {
         final currentPocket = pocketProvider.pockets.firstWhere(
@@ -141,7 +143,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
               child: _buildFeedItem(
                 name: activity.name,
                 avatarPath: activity.name == "You" || activity.name == "Me"
-                    ? "assets/avatars/avatar_3.jpg" 
+                    ? (appState.hasCreatedAvatar ? appState.avatarUrl : "assets/avatars/goxey_placeholder.png") 
                     : activity.name == "Liam" 
                         ? "assets/avatars/avatar_2.jpg" 
                         : "assets/avatars/avatar_5.jpg",
@@ -157,10 +159,9 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildCollectionSection() {
+  Widget _buildCollectionSection(AppState appState) {
     return Consumer<PocketProvider>(
       builder: (context, pocketProvider, child) {
-
         final List<String> activeMemberNames = ["Me", ...widget.pocket.members];
         
         return ListView.builder(
@@ -171,14 +172,17 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
             final name = activeMemberNames[index];
             final baseData = _allMembersBaseData.firstWhere((m) => m['name'] == name, orElse: () => _allMembersBaseData[0]);
             
-
             final Map<String, List<String>> collections = name == "Me" 
                 ? pocketProvider.userOwnedCollections 
                 : Map<String, List<String>>.from(baseData['ownedCollections'] ?? {});
 
+            final avatar = name == "Me" 
+                ? (appState.hasCreatedAvatar ? appState.avatarUrl : "assets/avatars/goxey_placeholder.png") 
+                : baseData['avatar'];
+
             return FadeInLeft(
               delay: Duration(milliseconds: index * 100),
-              child: _buildMemberCollectionCard(name, baseData['avatar'], collections),
+              child: _buildMemberCollectionCard(name, avatar, collections),
             );
           },
         );
@@ -187,7 +191,6 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
   }
 
   Widget _buildMemberCollectionCard(String name, String avatar, Map<String, List<String>> collections) {
-
     final List<Map<String, String>> allFigurines = [];
     collections.forEach((series, files) {
       String folder = "";
@@ -221,7 +224,9 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage(avatar),
+                  backgroundImage: avatar.startsWith('http')
+                      ? NetworkImage(avatar) as ImageProvider
+                      : AssetImage(avatar) as ImageProvider,
                   radius: 16,
                   backgroundColor: Colors.white10,
                 ),
@@ -292,7 +297,9 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundImage: AssetImage(avatarPath),
+            backgroundImage: avatarPath.startsWith('http')
+                ? NetworkImage(avatarPath) as ImageProvider
+                : AssetImage(avatarPath) as ImageProvider,
             radius: 20,
             backgroundColor: Colors.white10,
           ),
