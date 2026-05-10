@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
@@ -231,6 +233,7 @@ class SquadPocketsPage extends StatelessWidget {
     final nameController = TextEditingController();
     final targetController = TextEditingController();
     final List<String> selectedMembers = [];
+    String? generatedLink;
 
     showDialog(
       context: context,
@@ -297,15 +300,57 @@ class SquadPocketsPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 8),
+                if (generatedLink != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: GoXeyColors.neonLime.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.link, size: 18, color: GoXeyColors.neonLime),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            generatedLink!,
+                            style: const TextStyle(
+                              color: GoXeyColors.neonLime,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.copy, size: 18, color: Colors.white70),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: generatedLink!));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Link copied!"),
+                                backgroundColor: GoXeyColors.neonLime,
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 OutlinedButton.icon(
                   onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Invite link copied!"), backgroundColor: GoXeyColors.neonLime),
-                    );
+                    setState(() {
+                      final random = Random().nextInt(999999).toString().padLeft(6, '0');
+                      generatedLink = "goxey.app/join/$random";
+                    });
                   },
                   icon: const Icon(Icons.share, size: 18, color: Colors.white),
-                  label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
+                  label: Text(generatedLink == null ? "Share Invite Link" : "Regenerate Link", style: const TextStyle(color: Colors.white)),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.white24),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -338,6 +383,7 @@ class SquadPocketsPage extends StatelessWidget {
   }
 
   void _showFriendSelectionDialog(BuildContext context) {
+    String? generatedLink;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -346,48 +392,92 @@ class SquadPocketsPage extends StatelessWidget {
         title: const Text("Select Friends", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: SizedBox(
           width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search bank account number of friend/family member",
-                  hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white24),
+          child: StatefulBuilder(
+            builder: (context, setState) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search bank account number of friend/family member",
+                    hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.05),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.search, color: Colors.white24),
+                  ),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                style: const TextStyle(color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
-                    _buildFriendItem(context, "Tom", "5647382910 (CIMB)"),
-                    _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
-                  ],
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      _buildFriendItem(context, "Liam", "1029384756 (Maybank)"),
+                      _buildFriendItem(context, "Tom", "5647382910 (CIMB)"),
+                      _buildFriendItem(context, "Ethan", "9988776655 (Public Bank)"),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Link copied to clipboard!"), backgroundColor: GoXeyColors.neonLime),
-                  );
-                },
-                icon: const Icon(Icons.share, size: 18, color: Colors.white),
-                label: const Text("Share Invite Link", style: TextStyle(color: Colors.white)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.white24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                const SizedBox(height: 12),
+                if (generatedLink != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: GoXeyColors.neonLime.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.link, size: 18, color: GoXeyColors.neonLime),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            generatedLink!,
+                            style: const TextStyle(
+                              color: GoXeyColors.neonLime,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.copy, size: 18, color: Colors.white70),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: generatedLink!));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Link copied!"),
+                                backgroundColor: GoXeyColors.neonLime,
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                OutlinedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      final random = Random().nextInt(999999).toString().padLeft(6, '0');
+                      generatedLink = "goxey.app/join/$random";
+                    });
+                  },
+                  icon: const Icon(Icons.share, size: 18, color: Colors.white),
+                  label: Text(generatedLink == null ? "Share Invite Link" : "Regenerate Link", style: const TextStyle(color: Colors.white)),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white24),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
