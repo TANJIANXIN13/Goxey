@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:animate_do/animate_do.dart';
 import '../core/theme.dart';
 import 'glass_container.dart';
 
@@ -56,7 +57,7 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
 
     _timer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
       setState(() {
-        _progress += 0.005; // 4 seconds target to compensate for web lag
+        _progress += 20 / 5000; // Exactly 5 seconds
         if (_progress >= 1.0) {
           _timer?.cancel();
           _isPressing = false;
@@ -81,7 +82,10 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isWant ? GoXeyColors.radicalRed : GoXeyColors.neonLime;
+    final baseColor = widget.isWant ? GoXeyColors.radicalRed : GoXeyColors.neonLime;
+    final color = widget.isWant 
+        ? Color.lerp(GoXeyColors.radicalRed, GoXeyColors.neonLime, _progress)! 
+        : GoXeyColors.neonLime;
 
     return GestureDetector(
       onLongPressStart: (_) => _startPress(),
@@ -95,20 +99,29 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
         mainAxisSize: MainAxisSize.min,
         children: [
           AnimatedScale(
-            scale: _isPressing ? 0.95 : 1.0,
+            scale: _isPressing ? 1.1 : 1.0, // Scale up when pressing for "motor" feel
             duration: const Duration(milliseconds: 200),
             child: Stack(
               alignment: Alignment.center,
               children: [
                 if (widget.isWant)
                   CircularPercentIndicator(
-                    radius: 45.0,
-                    lineWidth: 6.0,
+                    radius: 50.0,
+                    lineWidth: 8.0,
                     percent: _progress,
                     circularStrokeCap: CircularStrokeCap.round,
                     backgroundColor: Colors.white.withOpacity(0.05),
                     progressColor: color,
                     animation: false,
+                    center: _isPressing ? Text(
+                      "${(_progress * 100).toInt()}%",
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                      ),
+                    ) : null,
                   ),
                 Container(
                   width: 70,
@@ -119,43 +132,48 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
                     boxShadow: [
                       BoxShadow(
                         color: color.withOpacity(_isPressing ? 0.6 : 0.2),
-                        blurRadius: _isPressing ? 20 : 10,
-                        spreadRadius: _isPressing ? 5 : 0,
+                        blurRadius: _isPressing ? 30 : 10,
+                        spreadRadius: _isPressing ? 10 : 0,
                       ),
                     ],
                     border: Border.all(
-                      color: widget.isWant ? color.withOpacity(0.5) : Colors.transparent,
+                      color: widget.isWant ? color.withOpacity(0.3) : Colors.transparent,
                       width: 2,
                     ),
                   ),
-                  child: Icon(
-                    widget.isWant ? Icons.lock_outline : Icons.check,
-                    color: widget.isWant ? color : GoXeyColors.blackRussian,
-                    size: 28,
-                  ),
+                  child: _isPressing && widget.isWant 
+                    ? const SizedBox.shrink() // Show percentage in center of indicator instead
+                    : Icon(
+                        widget.isWant ? Icons.lock_outline : Icons.check,
+                        color: widget.isWant ? color : GoXeyColors.blackRussian,
+                        size: 28,
+                      ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
-            widget.label,
+            _isPressing ? "CALMING DOWN..." : widget.label,
             style: TextStyle(
               color: color.withOpacity(0.8),
               fontWeight: FontWeight.bold,
-              fontSize: 10,
-              letterSpacing: 1.5,
+              fontSize: 11,
+              letterSpacing: 2.0,
             ),
           ),
           if (_isPressing && widget.isWant)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                "HOLD TO REGRET...",
-                style: TextStyle(
-                  color: color.withOpacity(0.5),
-                  fontSize: 8,
-                  letterSpacing: 2,
+              child: FadeIn(
+                child: Text(
+                  _progress < 0.3 ? "IS IT A NEED?" : _progress < 0.7 ? "ALMOST PAID..." : "THINK AGAIN!",
+                  style: TextStyle(
+                    color: color.withOpacity(0.6),
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.5,
+                  ),
                 ),
               ),
             ),

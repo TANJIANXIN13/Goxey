@@ -559,6 +559,7 @@ class _DashboardPageState extends State<DashboardPage> {
               label: "CONFIRM RM $amountString",
               onSuccess: () {
                 final appState = Provider.of<AppState>(context, listen: false);
+                appState.spendMoney(randomAmount);
                 appState.addTransaction(
                   name: "QR Payment",
                   category: "Spend",
