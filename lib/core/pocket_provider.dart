@@ -83,7 +83,7 @@ class PocketProvider extends ChangeNotifier {
     if (index != -1) {
       _pockets[index].saved += amount;
 
-      // Record milestone
+
       _pockets[index].activities.insert(
         0,
         PocketActivity(
@@ -103,7 +103,7 @@ class PocketProvider extends ChangeNotifier {
       _pullCounts[seriesName] = (_pullCounts[seriesName] ?? 0) + 1;
     }
     
-    // Add to user collection
+
     final normalizedSeriesName = seriesName.toUpperCase();
     final parts = imagePath.split('/');
     String fileName = parts.last;
@@ -111,7 +111,7 @@ class PocketProvider extends ChangeNotifier {
       fileName = 'custom/$fileName';
     }
     
-    // Find matching key or create new one
+
     String key = normalizedSeriesName;
     if (key == "DIMOO") key = "DIMOO";
     else if (key == "GX SERIES") key = "GX SERIES";
@@ -124,7 +124,7 @@ class PocketProvider extends ChangeNotifier {
     }
     
     if (isUpdate && _userOwnedCollections[key]!.isNotEmpty) {
-      // Replace the last one if it's an update (e.g. customized hidden)
+
       _userOwnedCollections[key]!.removeLast();
     }
 

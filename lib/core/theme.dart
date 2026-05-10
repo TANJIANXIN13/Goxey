@@ -11,7 +11,7 @@ class GoXeyColors {
   static const Color glassSurface = Color(0x1AFFFFFF);
   static const Color ghostWhite = Color(0xFFF5F5F7);
   
-  // GXBank Specific Colors
+
   static const Color gxPurple = Color(0xFF6B32FB);
   static const Color gxDarkCard = Color(0xFF1C1C24);
   static const Color gxCyan = Color(0xFF38DBFF);

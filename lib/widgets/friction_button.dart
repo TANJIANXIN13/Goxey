@@ -57,7 +57,7 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
 
     _timer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
       setState(() {
-        _progress += 20 / 5000; // Exactly 5 seconds
+        _progress += 20 / 5000;
         if (_progress >= 1.0) {
           _timer?.cancel();
           _isPressing = false;
@@ -99,7 +99,7 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
         mainAxisSize: MainAxisSize.min,
         children: [
           AnimatedScale(
-            scale: _isPressing ? 1.1 : 1.0, // Scale up when pressing for "motor" feel
+            scale: _isPressing ? 1.1 : 1.0,
             duration: const Duration(milliseconds: 200),
             child: Stack(
               alignment: Alignment.center,
@@ -142,7 +142,7 @@ class _FrictionButtonState extends State<FrictionButton> with SingleTickerProvid
                     ),
                   ),
                   child: _isPressing && widget.isWant 
-                    ? const SizedBox.shrink() // Show percentage in center of indicator instead
+                    ? const SizedBox.shrink()
                     : Icon(
                         widget.isWant ? Icons.lock_outline : Icons.check,
                         color: widget.isWant ? color : GoXeyColors.blackRussian,

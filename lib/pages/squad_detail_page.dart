@@ -1,4 +1,4 @@
-// FIXED BY ANTIGRAVITY - NO MORE GX_KID
+
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
@@ -100,7 +100,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Always include "Me" as the first member of any pocket
+
     final List<String> activeMemberNames = ["Me", ...widget.pocket.members];
 
     if (activeMemberNames.isEmpty) {
@@ -118,7 +118,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
       orElse: () => _squadMembersData[0]
     );
     
-    // Inject dynamic collection for "Me"
+
     final currentMember = currentMemberName == "Me" 
         ? {...baseMember, 'ownedCollections': pocketProvider.userOwnedCollections}
         : baseMember;
@@ -144,7 +144,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Progress Section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -197,7 +197,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
             const SizedBox(height: 30),
 
-            // YOUR SQUAD SECTION
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -220,7 +220,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
             const SizedBox(height: 30),
 
-            // COLLECTION SECTION TITLE
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -231,11 +231,11 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
             const SizedBox(height: 20),
 
-            // Main Collection View
+
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Left Side: 3D Preview + Milestones Button
+
                 Expanded(
                   flex: 4,
                   child: Column(
@@ -281,7 +281,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
 
                       const SizedBox(height: 15),
 
-                      // Member Selector
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -307,7 +307,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
                   ),
                 ),
 
-                // Right Side: Shelves
+
                 Expanded(
                   flex: 6,
                   child: Container(
@@ -433,7 +433,7 @@ class _SquadDetailPageState extends State<SquadDetailPage> {
               ],
             ),
           ),
-          // Figurines
+
           Positioned(
             right: 10,
             bottom: 5,

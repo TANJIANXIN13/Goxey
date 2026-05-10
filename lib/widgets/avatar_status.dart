@@ -19,7 +19,7 @@ class AvatarStatus extends StatelessWidget {
         Stack(
           alignment: Alignment.center,
           children: [
-            // Outer glow
+
             Container(
               width: 180,
               height: 180,
@@ -33,7 +33,7 @@ class AvatarStatus extends StatelessWidget {
                 ),
               ),
             ),
-            // Avatar Placeholder
+
             Opacity(
               opacity: isGhostMode ? 0.3 : 1.0,
               child: Container(
@@ -84,12 +84,12 @@ class AvatarStatus extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 24),
-        // Squad Layer
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSquadMember("https://api.dicebear.com/7.x/avataaars/png?seed=Felix", false),
-            _buildSquadMember("https://api.dicebear.com/7.x/avataaars/png?seed=Sarah", true), // Sarah is a ghost
+            _buildSquadMember("https://api.dicebear.com/7.x/avataaars/png?seed=Sarah", true),
             _buildSquadMember("https://api.dicebear.com/7.x/avataaars/png?seed=Jin", false),
             Container(
               width: 36,

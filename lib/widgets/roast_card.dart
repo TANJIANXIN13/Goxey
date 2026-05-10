@@ -51,7 +51,7 @@ class RoastCard extends StatelessWidget {
         final currentTotal = pocketProvider.totalSaved + appState.totalBalance;
         final totalSaved = currentTotal - initialTotal;
         final totalTarget =
-            10000.0; // Fixed milestone target that accommodates total balance
+            10000.0;
         final advice = _getAdvice(totalSaved, totalTarget);
         final cardColor = _getColor(totalSaved, totalTarget);
         final cardEmoji = _getEmoji(totalSaved, totalTarget);

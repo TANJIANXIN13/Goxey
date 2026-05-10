@@ -419,7 +419,7 @@ class _PieChartPainter extends CustomPainter {
       final sweepAngle = (data[i] / total) * 2 * math.pi;
       paint.color = colors[i % colors.length];
       
-      // Draw arc with a small gap
+
       canvas.drawArc(rect, startAngle + 0.05, sweepAngle - 0.1, false, paint);
       
       startAngle += sweepAngle;

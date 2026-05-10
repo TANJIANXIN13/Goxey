@@ -198,12 +198,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 final newBalance = appState.pocketsBalance;
                 Navigator.pop(context);
 
-                // Check for RM 10,000 Milestone
                 final oldMilestoneCount = (oldBalance ~/ 10000);
                 final newMilestoneCount = (newBalance ~/ 10000);
                 
                 if (newMilestoneCount > oldMilestoneCount) {
-                  // Only trigger if we cross a new 10k boundary
                   Future.delayed(const Duration(milliseconds: 500), () {
                     _showRedemptionDialog(amount);
                   });
@@ -263,7 +261,7 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     });
 
-    int currentStep = 0; // 0: Congrats, 1: Select Figure, 2: Method, 3: Form, 4: Done
+    int currentStep = 0;
     String? selectedFigurine;
     String? selectedMethod;
     
@@ -548,10 +546,28 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "Late night Shopee haul? You already have 3 keyboards.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+            Builder(
+              builder: (context) {
+                final List<String> roastQuotes = [
+                  "Late night Shopee haul? You already have 3 keyboards.",
+                  "Do you really need this, or are you just bored and hungry?",
+                  "Your bank account is crying, but your closet is smiling. Stop.",
+                  "Another blind box? You're building a plastic army, not a future.",
+                  "Is this a 'must-have' or just a 'must-distract-myself-from-life'?",
+                  "You have RM 50 in your savings and RM 500 in your cart. Math isn't mathing.",
+                  "This purchase is 10% utility and 90% temporary dopamine.",
+                  "Remember that thing you bought last week and never used? This is its sibling.",
+                  "If you close this app now, you'll forget this exists in 5 minutes.",
+                  "Your future self is screaming at you from 2030. Listen to them.",
+                  "Treating yourself? You've 'treated yourself' 14 times this month already.",
+                ];
+                final quote = roastQuotes[math.Random().nextInt(roastQuotes.length)];
+                return Text(
+                  quote,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                );
+              },
             ),
             const SizedBox(height: 32),
             FrictionButton(
@@ -559,20 +575,47 @@ class _DashboardPageState extends State<DashboardPage> {
               label: "CONFIRM RM $amountString",
               onSuccess: () {
                 final appState = Provider.of<AppState>(context, listen: false);
+                
+                final List<Map<String, dynamic>> transactionOptions = [
+                  {"name": "Tealive", "category": "Food & Drink", "icon": Icons.local_drink, "color": GoXeyColors.neonLime},
+                  {"name": "Zus Coffee", "category": "Food & Drink", "icon": Icons.local_cafe, "color": GoXeyColors.neonLime},
+                  {"name": "Starbucks", "category": "Food & Drink", "icon": Icons.local_cafe, "color": GoXeyColors.neonLime},
+                  {"name": "Foodpanda", "category": "Food & Drink", "icon": Icons.delivery_dining, "color": GoXeyColors.neonLime},
+                  {"name": "McDonald's", "category": "Food & Drink", "icon": Icons.fastfood, "color": GoXeyColors.neonLime},
+                  {"name": "KFC", "category": "Food & Drink", "icon": Icons.fastfood, "color": GoXeyColors.neonLime},
+                  {"name": "Steam Purchase", "category": "Gaming", "icon": Icons.games, "color": Colors.cyanAccent},
+                  {"name": "Karaoke", "category": "Gaming", "icon": Icons.mic, "color": Colors.cyanAccent},
+                  {"name": "Razer Gold", "category": "Gaming", "icon": Icons.videogame_asset, "color": Colors.cyanAccent},
+                  {"name": "PS Store", "category": "Gaming", "icon": Icons.sports_esports, "color": Colors.cyanAccent},
+                  {"name": "Grab", "category": "Transport", "icon": Icons.directions_car, "color": Colors.yellowAccent},
+                  {"name": "MRT", "category": "Transport", "icon": Icons.train, "color": Colors.yellowAccent},
+                  {"name": "LRT", "category": "Transport", "icon": Icons.subway, "color": Colors.yellowAccent},
+                  {"name": "Shell Petrol", "category": "Transport", "icon": Icons.local_gas_station, "color": Colors.yellowAccent},
+                  {"name": "Uniqlo", "category": "Shopping", "icon": Icons.shopping_bag, "color": Colors.orangeAccent},
+                  {"name": "Shopee", "category": "Shopping", "icon": Icons.shopping_cart, "color": Colors.orangeAccent},
+                  {"name": "Taobao", "category": "Shopping", "icon": Icons.shopping_basket, "color": Colors.orangeAccent},
+                  {"name": "Lazada", "category": "Shopping", "icon": Icons.store, "color": Colors.orangeAccent},
+                  {"name": "FamilyMart", "category": "Food & Drink", "icon": Icons.storefront, "color": GoXeyColors.neonLime},
+                  {"name": "Golden Screen Cinema", "category": "Gaming", "icon": Icons.movie, "color": Colors.cyanAccent},
+                ];
+
+                final random = math.Random();
+                final picked = transactionOptions[random.nextInt(transactionOptions.length)];
+
                 appState.spendMoney(randomAmount);
                 appState.addTransaction(
-                  name: "QR Payment",
-                  category: "Spend",
+                  name: picked["name"],
+                  category: picked["category"],
                   amount: -randomAmount,
-                  icon: Icons.qr_code_scanner,
-                  color: GoXeyColors.radicalRed,
+                  icon: picked["icon"],
+                  color: picked["color"],
                 );
                 Navigator.pop(context);
                 SpendVisualizer.show(
                   context,
                   amount: randomAmount,
                   item: "Maggi",
-                  count: (randomAmount / 2).floor(), // Assuming RM 2 per Maggi
+                  count: (randomAmount / 2).floor(),
                 );
               },
             ),
@@ -602,7 +645,6 @@ class _DashboardPageState extends State<DashboardPage> {
     final totalTarget = 10000.0;
     double percent = totalTarget == 0 ? 0 : (totalSaved / totalTarget) * 100;
 
-    // Reset index to Home if switching to Original Mode while on a restricted tab
     if (!isGoxey && _currentIndex != 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _currentIndex != 0) {
@@ -623,11 +665,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 ? [
                     const Color(0xFF212427),
                     const Color(0xFF212427),
-                  ] // Solid #212427
+                  ]
                 : [
                     GoXeyColors.gxBgTop,
                     GoXeyColors.gxBgBottom,
-                  ], // GXBank Classic
+                  ],
           ),
         ),
         child: SafeArea(
@@ -685,7 +727,6 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 24),
           _buildQuickActions(isGoxey),
           const SizedBox(height: 32),
-          // Lower section starts here
           IgnorePointer(
             ignoring: !isGoxey,
             child: Column(
@@ -921,7 +962,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Consumer<PocketProvider>(
       builder: (context, pocketProvider, _) {
         final pockets = pocketProvider.pockets;
-        // Build all cards: Main Account + one per pocket
         final cards = <Widget>[
           _buildAccountCard(
             "Main Account",
@@ -1139,8 +1179,6 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // Ensure initial page results in index 0 (GoXey Original)
-    // 5005 is a multiple of 7 (our series count)
     _currentSeriesPage = 5005;
   }
 
@@ -1173,7 +1211,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
           const SizedBox(height: 16),
-          // Series Carousel (Infinite Loop)
           SizedBox(
             height: 420,
             child: ScrollConfiguration(
@@ -1411,7 +1448,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildPhysicalRedemptionSection(AppState appState, double totalSaved) {
     final available = appState.availablePhysicalBoxes;
     
-    // Surprise! Hide the section if no redemptions are available
     if (available == 0) return const SizedBox.shrink();
 
     return Column(
@@ -1420,7 +1456,7 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildAvatarAction(
           "Redeem Physical Figure ($available)",
           Icons.store,
-          () => _showRedemptionDialog(10000), // Default display for manual click
+          () => _showRedemptionDialog(10000),
           isHighlight: true,
         ),
       ],
@@ -1592,7 +1628,6 @@ class _DashboardPageState extends State<DashboardPage> {
             unselectedLabelStyle: const TextStyle(fontSize: 10),
             onTap: (index) {
               if (!isGoxey && index != 0) {
-                // Stay on Home in Original Mode
                 return;
               }
               setState(() => _currentIndex = index);

@@ -21,7 +21,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
   final PageController _pageController = PageController(viewportFraction: 0.8);
   int _selectedAvatarIndex = 0;
 
-  // 10 unique avatars from your collection
+
   final List<String> _avatarOptions = [
     "assets/avatars/AvatarYX.jpg",
     "assets/avatars/avatar_1.jpg",
@@ -84,7 +84,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
 
     setState(() => _isProcessing = true);
 
-    // Simulate AI Processing
+
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
@@ -92,9 +92,9 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
         _isProcessing = false;
         _showSelection = true;
         
-        // Forced to index 0 (AvatarYX.jpg)
+
         _selectedAvatarIndex = 0; 
-        // Jump to the nearest multiple of length to show index 0
+
         int jumpTo = (1000 ~/ _avatarOptions.length) * _avatarOptions.length;
         if (jumpTo < 500) jumpTo += _avatarOptions.length * 50; 
         _currentPage = jumpTo;
@@ -167,7 +167,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
 
     return Container(
       margin: const EdgeInsets.all(24),
-      constraints: const BoxConstraints(maxWidth: 400), // Prevent stretching on wide screens
+      constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: GoXeyColors.neonLime.withOpacity(0.3), width: 2),
@@ -193,7 +193,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
         ),
         const SizedBox(height: 30),
         SizedBox(
-          height: 450, // Increased height to see the whole avatar
+          height: 450,
           child: ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {
@@ -232,7 +232,7 @@ class _AvatarCreatorPageState extends State<AvatarCreatorPage> {
                       borderRadius: BorderRadius.circular(28),
                       child: Image.asset(
                         _avatarOptions[actualIndex],
-                        fit: BoxFit.contain, // Changed from cover to contain
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

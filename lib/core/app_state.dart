@@ -32,11 +32,11 @@ class AppState extends ChangeNotifier {
   int get lastRedeemedMilestone => _lastRedeemedMilestone;
   int get usedPhysicalBoxesCount => _usedPhysicalBoxesCount;
 
-  // Every RM 200 gives 1 box
+
   int get availableBoxes => (_pocketsBalance ~/ 200) - _usedBoxesCount;
   double get progressToNextBox => (_pocketsBalance % 200) / 200;
 
-  // Physical boxes: every RM 10,000
+
   int get availablePhysicalBoxes => (_pocketsBalance ~/ 10000) - _usedPhysicalBoxesCount;
   double get progressToNextPhysicalBox => (_pocketsBalance % 10000) / 10000;
 
@@ -63,10 +63,10 @@ class AppState extends ChangeNotifier {
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
     _isGoxeyMode = prefs.getBool('isGoxeyMode') ?? false;
-    _totalBalance = 5000.00; // Always start with 5k as requested
+    _totalBalance = 5000.00;
 
-    _pocketsBalance = 2150.00; // Force to initial state
-    _usedBoxesCount = 10;     // Force to initial state
+    _pocketsBalance = 2150.00;
+    _usedBoxesCount = 10;
     _usedPhysicalBoxesCount = prefs.getInt('usedPhysicalBoxesCount') ?? 0;
     
     await prefs.setDouble('pocketsBalance', _pocketsBalance);

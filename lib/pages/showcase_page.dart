@@ -19,7 +19,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
     {
       "name": "Me",
       "avatar": "assets/avatars/avatar_3.jpg",
-      "ownedCollections": {}, // Will be filled dynamically
+      "ownedCollections": {},
     },
     {
       "name": "Liam",
@@ -160,7 +160,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
   Widget _buildCollectionSection() {
     return Consumer<PocketProvider>(
       builder: (context, pocketProvider, child) {
-        // Members list starts with "Me" and then the ones in the pocket
+
         final List<String> activeMemberNames = ["Me", ...widget.pocket.members];
         
         return ListView.builder(
@@ -171,7 +171,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
             final name = activeMemberNames[index];
             final baseData = _allMembersBaseData.firstWhere((m) => m['name'] == name, orElse: () => _allMembersBaseData[0]);
             
-            // For "Me", use the live collection from provider
+
             final Map<String, List<String>> collections = name == "Me" 
                 ? pocketProvider.userOwnedCollections 
                 : Map<String, List<String>>.from(baseData['ownedCollections'] ?? {});
@@ -187,7 +187,7 @@ class _ShowcasePageState extends State<ShowcasePage> with SingleTickerProviderSt
   }
 
   Widget _buildMemberCollectionCard(String name, String avatar, Map<String, List<String>> collections) {
-    // Flatten all figurines into a single list for this summary view
+
     final List<Map<String, String>> allFigurines = [];
     collections.forEach((series, files) {
       String folder = "";

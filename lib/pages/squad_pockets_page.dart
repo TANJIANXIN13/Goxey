@@ -276,7 +276,7 @@ class SquadPocketsPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 const Text("Invite Members", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                // Pre-existing friends list
+
                 ...["Liam – 1029384756 (Maybank)", "Tom – 5647382910 (CIMB)", "Ethan – 9988776655 (Public Bank)"].map(
                   (friend) {
                     final name = friend.split(' ')[0];

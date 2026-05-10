@@ -22,7 +22,7 @@ class AvatarViewer extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
     final url = modelUrl ?? appState.avatarUrl;
 
-    // Check if the URL is an asset path (GoXey IP avatars) or a 3D model
+
     bool isAsset = url.startsWith('assets/');
     bool isGlb = url.endsWith('.glb');
 
@@ -72,8 +72,8 @@ class AvatarViewer extends StatelessWidget {
     }
 
     if (!showBackground && isAsset) {
-      // Apply a subtle shader mask to fade edges and help 'crop' the avatar people 
-      // from their rectangular image backgrounds
+
+
       return ShaderMask(
         shaderCallback: (rect) {
           return LinearGradient(

@@ -33,7 +33,7 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
   bool _isRevealed = false;
   bool _isHidden = false;
   bool _isCustomizing = false;
-  String _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png"; // Default placeholder
+  String _revealedAvatarUrl = "assets/avatars/goxey_placeholder.png";
   int _customIndex = 0;
 
   final List<String> _dimooCustomPool = [
@@ -65,11 +65,11 @@ class _BlindBoxPageState extends State<BlindBoxPage> {
       final pocketProvider = Provider.of<PocketProvider>(context, listen: false);
       int pullCount = pocketProvider.getPullCount(widget.seriesName);
       
-      // Rule: No hidden in the first 3 pulls for each series
+
       if (pullCount < 3) {
         _isHidden = false;
       } else {
-        // Normal odds (e.g., 10% for testing or randomized)
+
         _isHidden = (DateTime.now().millisecond % 5 == 0); 
       }
       
