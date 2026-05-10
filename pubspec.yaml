@@ -34,8 +34,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
-  animate_do: ^3.3.4
+  google_fonts: ^8.1.0
+  animate_do: ^5.1.0
   lottie: ^3.1.2
   percent_indicator: ^4.2.3
   flutter_lucide: ^1.1.0
@@ -43,7 +43,7 @@ dependencies:
   model_viewer_plus: ^1.7.0
   shared_preferences: ^2.2.3
   image_picker: ^1.1.2
-  camera: ^0.11.0+2
+  camera: ^0.12.0+1
 
 dev_dependencies:
   flutter_test:
