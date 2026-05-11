@@ -1,4 +1,4 @@
-# Goxey 🚀
+# Goxey 🏦
 
 **Goxey** is a premium, Gen Z-focused financial extension for GXBank designed to make saving fun and spending intentional. By combining gamification, AI-driven insights, and social features, Goxey transforms the boring banking experience into an engaging journey.
 
@@ -62,5 +62,9 @@ Follow these steps to set up and run the app locally:
 
 ---
 
-*Built with ❤️ for the next generation of savers.*
+## 🔥Here are the links to access our slide and video:
+
+Slides: https://drive.google.com/file/d/1cl9Sr_4Pegm6H1Yj2puPxcL6yly6KtO3/view?usp=sharing
+
+Video: https://drive.google.com/file/d/1kcC2IKO9MckP44jANreH2BhcUu-AAr0-/view?usp=sharing
 
