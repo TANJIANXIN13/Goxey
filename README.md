@@ -64,7 +64,7 @@ Follow these steps to set up and run the app locally:
 
 ## 🔥Here are the links to access our slide and video:
 
-Slides: https://drive.google.com/file/d/1TukFTBpEfvi2_vPC2RxI7bsjTS2rXoyS/view?usp=drivesdk
+Slides: https://drive.google.com/file/d/18eicSFmKBuCY7Si6UHXA9XLAxIBv6WrJ/view?usp=drivesdk
 
 Video: https://drive.google.com/file/d/1kcC2IKO9MckP44jANreH2BhcUu-AAr0-/view?usp=sharing
 
